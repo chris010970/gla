@@ -20,7 +20,11 @@ def parseArguments(args=None):
     # parse command line arguments
     parser = argparse.ArgumentParser(description='process ard')
     parser.add_argument('scene', action="store")
+
+    # options
     parser.add_argument('-roi', nargs=4,default=None, action="store", type=float )
+    parser.add_argument('-dem_path', default=None, action="store" )
+    parser.add_argument('-geoid_pathname', default=None, action="store" )
     
     return parser.parse_args(args)
 
@@ -55,8 +59,8 @@ def main():
 
                     # create spot object and process ard
                     obj = Pleiades( scene,
-                                    dem_path='D:\\data\\ancillary\\srtm',
-                                    geoid_pathname='D:\\data\\ancillary\\geoid\\egm96.grd',
+                                    dem_path=args.dem_path,
+                                    geoid_pathname=args.geoid_pathname,
                                     pan_method='bayes',
                                     roi=args.roi )
 
@@ -66,8 +70,8 @@ def main():
 
                     # create spot object and process ard
                     obj = Spot( scene,
-                                dem_path='D:\\data\\ancillary\\srtm',
-                                geoid_pathname='D:\\data\\ancillary\\geoid\\egm96.grd',
+                                dem_path=args.dem_path,
+                                geoid_pathname=args.geoid_pathname,
                                 pan_method='bayes',
                                 roi=args.roi )
 
