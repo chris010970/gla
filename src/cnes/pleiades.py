@@ -48,8 +48,8 @@ class Pleiades ( Dataset ):
             os.makedirs( path )
 
         # extract dataset to tmp path
-        #out, err, code = ps.extractZip( self._scene, path )
-        code = 0
+        out, err, code = ps.extractZip( self._scene, path )
+        #code = 0
         if code == 0:
         
             # get image list and corresponding srtm tiles
@@ -73,10 +73,13 @@ class Pleiades ( Dataset ):
                     out_path = os.path.join( root_path, 'roi/{}'.format( _id ) )
                     mosaic[ _id ] = self.getRoiImage( mosaic[ _id ], out_path )
 
-            # create pansharpened image
+            # superimpose multispectral image on panchromatic geometry
+            out_path = os.path.join( root_path, 'pan' )
+            mosaic[ 'MS' ] = self.getSuperimposedImage( mosaic, out_path )
+
+            # generate pansharpened image
             out_path = os.path.join( root_path, 'pan' )
             pan_image = self.getPansharpenImage( mosaic, out_path )
-
 
         return
 

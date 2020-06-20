@@ -1,14 +1,19 @@
 import os
 import re
+import sys
 import glob
 from datetime import datetime
+
+# logging
+from contextlib import redirect_stdout
+from contextlib import redirect_stderr
 
 # otb imports
 import otbApplication
 
 # local imports
-from src.utility import parser
 from src.utility import ps
+from src.utility import parser
 from src.utility.bbox import BBox
 
 class Dataset:
@@ -36,7 +41,6 @@ class Dataset:
         # optional arguments + default values
         self._dem_path = kwargs.pop('dem_path', None)
         self._geoid_pathname = kwargs.pop( 'geoid_pathname', None ) 
-        self._ram = kwargs.pop('ram', 4096)
         self._epsg = kwargs.pop('epsg', None )
         self._pan_method = kwargs.pop('pan_method', None )
         self._roi = None
@@ -45,7 +49,20 @@ class Dataset:
         coords = kwargs.pop('roi', None )
         if coords is not None:
             self._roi = BBox( coords )
-            
+
+        # set default ram usage
+        self._ram = kwargs.pop('ram', 4096)
+        os.environ['OTB_MAX_RAM_HINT'] = str( self._ram )
+
+        # setup log file
+        log_path = kwargs.pop('log', 'D:\\data\\log' )
+        if not os.path.exists( log_path ):
+            os.makedirs( log_path )
+
+        # capture stdout  
+        log_pathname = os.path.join( log_path, os.path.basename( scene ).replace( '.zip', '.log' ) )  
+        self._log = open( log_pathname, 'w', buffering=1 )
+
         return
 
 
@@ -193,7 +210,8 @@ class Dataset:
             app.SetParameterString( 'tiledir', self._dem_path )
 
             # execute download
-            app.ExecuteAndWriteOutput()
+            with redirect_stdout( self._log ), redirect_stderr( self._log ):
+                app.ExecuteAndWriteOutput()
 
         return
 
@@ -221,8 +239,7 @@ class Dataset:
                 # initialise arguments
                 app.SetParameterString('in', image )
                 app.SetParameterString('level', level )            
-                app.SetParameterString('out', out_pathname )
-                app.SetParameterString('ram', str( self._ram ) )
+                app.SetParameterString('out', out_pathname + '?&gdal:co:TILED=YES' )
 
                 # output to 0 -> 1000 16bit rather than 0 -> 1.0 32bit float
                 app.SetParameterString('milli', str( milli ) )            
@@ -230,7 +247,8 @@ class Dataset:
                     app.SetParameterOutputImagePixelType('out', otbApplication.ImagePixelType_uint16 )
 
                 # execute and write products
-                app.ExecuteAndWriteOutput()
+                with redirect_stdout( self._log ), redirect_stderr( self._log ):
+                    app.ExecuteAndWriteOutput()
 
             # add to list
             out_images.append( out_pathname )
@@ -275,12 +293,13 @@ class Dataset:
 
                     # initialise arguments
                     app.SetParameterStringList('il', images )
-                    app.SetParameterString('out', out_pathname )
+                    app.SetParameterString('out', out_pathname + '?&gdal:co:TILED=YES' )
                     app.SetParameterInt('cols', ncols )
                     app.SetParameterInt('rows', nrows )
 
                     # execute and write products
-                    app.ExecuteAndWriteOutput()
+                    with redirect_stdout( self._log ), redirect_stderr( self._log ):
+                        app.ExecuteAndWriteOutput()
 
             else:
                 
@@ -314,7 +333,7 @@ class Dataset:
 
                 # setup input and output
                 app.SetParameterString( 'in', image )
-                app.SetParameterString( 'out', out_pathname )
+                app.SetParameterString( 'out', out_pathname + '?&gdal:co:TILED=YES' )
                 app.SetParameterString( 'mode', 'extent' )
 
                 # copy corner coordinates of aoi
@@ -324,13 +343,13 @@ class Dataset:
                 app.SetParameterFloat( 'mode.extent.lry', coords[ 3 ] )
 
                 # execute download
-                app.ExecuteAndWriteOutput()
-
+                with redirect_stdout( self._log ), redirect_stderr( self._log ):
+                    app.ExecuteAndWriteOutput()
 
         return out_pathname
 
 
-    def getPansharpenImage( self, images, out_path ):
+    def getPansharpenImage_Bundle( self, images, out_path ):
 
         """
         generate pansharpened images
@@ -350,8 +369,7 @@ class Dataset:
             # initialise parameters
             app.SetParameterString('inp', images[ 'P' ] )
             app.SetParameterString('inxs', images[ 'MS' ] )
-            app.SetParameterString('out', out_pathname )
-            app.SetParameterString('ram', str( self._ram ) )
+            app.SetParameterString('out', out_pathname + '?&gdal:co:TILED=YES' )
 
             # configure elevation parameters
             if self._dem_path is not None and self._geoid_pathname is not None:
@@ -363,6 +381,75 @@ class Dataset:
                     app.SetParameterString('method', self._pan_method )
 
             # generate pansharpen images
-            app.ExecuteAndWriteOutput()
+            with redirect_stdout( self._log ), redirect_stderr( self._log ):
+                app.ExecuteAndWriteOutput()
 
         return out_pathname
+
+
+    def getSuperimposedImage( self, images, out_path ):
+
+        """
+        generate multispectral image superimposed to panchromatic image geometry
+        """
+
+        # create app
+        app = otbApplication.Registry.CreateApplication('Superimpose')
+                                
+        # create output pathname
+        out_pathname = os.path.join( out_path, os.path.basename( images[ 'MS' ] ).replace( '_MS_', '_MS_SUPER_' ) )
+        if not os.path.exists( out_pathname ):
+
+            # create out path if required
+            if not os.path.exists( out_path ):
+                os.makedirs( out_path )
+
+            # initialise parameters
+            app.SetParameterString('inr', images[ 'P' ] )
+            app.SetParameterString('inm', images[ 'MS' ] )
+            app.SetParameterString('out', out_pathname + '?&gdal:co:TILED=YES' )
+
+            # configure elevation parameters
+            if self._dem_path is not None and self._geoid_pathname is not None:
+                app.SetParameterString('elev.dem', self._dem_path )
+                app.SetParameterString('elev.geoid', self._geoid_pathname )
+
+            # generate pansharpen images
+            with redirect_stdout( self._log ), redirect_stderr( self._log ):
+                app.ExecuteAndWriteOutput()
+
+        return out_pathname
+
+
+    def getPansharpenImage( self, images, out_path ):
+
+        """
+        generate multispectral image superimposed to panchromatic image geometry
+        """
+
+        # create app
+        app = otbApplication.Registry.CreateApplication('Pansharpening')
+                                
+        # create output pathname
+        out_pathname = os.path.join( out_path, os.path.basename( images[ 'MS' ] ).replace( '_MS_SUPER_', '_PAN_' ) )
+        if not os.path.exists( out_pathname ):
+
+            # create out path if required
+            if not os.path.exists( out_path ):
+                os.makedirs( out_path )
+
+            # initialise parameters
+            app.SetParameterString('inp', images[ 'P' ] )
+            app.SetParameterString('inxs', images[ 'MS' ] )
+            app.SetParameterString('out', out_pathname + '?&gdal:co:TILED=YES&gdal:co:COMPRESS=DEFLATE&gdal:co:BIGTIFF=YES' )
+
+            # set method (rcs, lvms, bayes)
+            if self._pan_method is not None:
+                app.SetParameterString('method', self._pan_method )
+
+            # generate pansharpen images
+            with redirect_stdout( self._log ), redirect_stderr( self._log ):
+                app.ExecuteAndWriteOutput()
+
+        return out_pathname
+
