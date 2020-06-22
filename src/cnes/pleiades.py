@@ -1,5 +1,9 @@
 import os
 
+# logging
+from contextlib import redirect_stdout
+from contextlib import redirect_stderr
+
 # local imports
 from dataset import Dataset
 from src.utility import ps
@@ -45,6 +49,8 @@ class Pleiades ( Dataset ):
 
         # extract dataset to tmp path
         out, err, code = ps.extractZip( self._scene, path )
+        self._log_file.write( '{}\n{}'.format ( out, err ) )
+
         if code == 0:
         
             # get image list and corresponding srtm tiles
@@ -68,7 +74,11 @@ class Pleiades ( Dataset ):
                     out_path = os.path.join( root_path, 'roi/{}'.format( _id ) )
                     mosaic[ _id ] = self.getRoiImage( mosaic[ _id ], out_path )
 
+
             # superimpose multispectral image on panchromatic geometry
+            out_path = os.path.join( root_path, 'roi_compress/MS' )
+            mosaic_ms_compress = self.convertImage( mosaic[ 'MS' ], out_path, options=['COMPRESS=DEFLATE', 'TILED=YES' ] )
+             
             out_path = os.path.join( root_path, 'pan' )
             mosaic[ 'MS' ] = self.getSuperimposedImage( mosaic, out_path )
 
@@ -77,6 +87,5 @@ class Pleiades ( Dataset ):
             pan_image = self.getPansharpenImage( mosaic, out_path )
 
 
-        # return pansharpened image and multispectral mosaic
-        return pan_image, mosaic[ 'MS' ]
-
+        # return pansharpened image and compressed multispectral mosaic + geom files
+        return [ pan_image, pan_image.replace( '.TIF', '.geom' ), mosaic_ms_compress, mosaic_ms_compress.replace( '.TIF', '.geom' ) ]

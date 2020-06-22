@@ -1,6 +1,6 @@
 import os
 import re
-import sys
+import gdal
 import glob
 from datetime import datetime
 
@@ -52,17 +52,17 @@ class Dataset:
             self._roi = BBox( coords )
 
         # set default ram usage
-        self._ram = kwargs.pop('ram', 4096)
+        self._ram = kwargs.pop( 'ram', 4096 )
         os.environ['OTB_MAX_RAM_HINT'] = str( self._ram )
 
-        # setup log file
-        log_path = kwargs.pop('log', 'D:\\data\\log' )
-        if not os.path.exists( log_path ):
+        # make log path
+        log_path = kwargs.pop( 'log_path', '.' )
+        if not os.path.exists( log_path ) and log_path is not '.' :
             os.makedirs( log_path )
 
-        # capture stdout  
+        # create log file
         log_pathname = os.path.join( log_path, os.path.basename( scene ).replace( '.zip', '.log' ) )  
-        self._log = open( log_pathname, 'a+', buffering=1 )
+        self._log_file = open( log_pathname, 'a+', buffering=1 )
 
         return
 
@@ -197,7 +197,6 @@ class Dataset:
             image_path = os.path.join( path, '**/IMG_{platform}_{id}_*/IMG_{platform}_{id}_*.TIF'.format ( platform=self._platform, id=_id ) )
             images[ _id ] = glob.glob( image_path, recursive=True )
 
-
         return images
 
 
@@ -216,7 +215,7 @@ class Dataset:
             app.SetParameterString( 'tiledir', self._dem_path )
 
             # execute download
-            with redirect_stdout( self._log ), redirect_stderr( self._log ):
+            with redirect_stdout( self._log_file ), redirect_stderr( self._log_file ):
                 app.ExecuteAndWriteOutput()
 
         return
@@ -253,7 +252,7 @@ class Dataset:
                     app.SetParameterOutputImagePixelType('out', otbApplication.ImagePixelType_uint16 )
 
                 # execute and write products
-                with redirect_stdout( self._log ), redirect_stderr( self._log ):
+                with redirect_stdout( self._log_file ): #, redirect_stderr( self._log_file ):
                     app.ExecuteAndWriteOutput()
 
             # add to list
@@ -304,7 +303,7 @@ class Dataset:
                     app.SetParameterInt('rows', nrows )
 
                     # execute and write products
-                    with redirect_stdout( self._log ), redirect_stderr( self._log ):
+                    with redirect_stdout( self._log_file ), redirect_stderr( self._log_file ):
                         app.ExecuteAndWriteOutput()
 
             else:
@@ -315,7 +314,7 @@ class Dataset:
         return out_pathname
 
 
-    def getRoiImage( self, image, out_path ):
+    def getRoiImage( self, image, out_path, channels=None ):
 
         """
         get aoi images
@@ -327,30 +326,36 @@ class Dataset:
 
         # get roi coordinates
         coords = self._roi.getImageRoi( image )
-        if coords is not None: 
 
-            # check out pathname exists
-            out_pathname = os.path.join( out_path, os.path.basename( image ).replace( '.TIF', '_ROI.TIF' ) )
-            if not os.path.exists( out_pathname ):
+        # check out pathname exists
+        out_pathname = os.path.join( out_path, os.path.basename( image ).replace( '.TIF', '_ROI.TIF' ) )
+        if not os.path.exists( out_pathname ):
 
-                # create out path if required
-                if not os.path.exists( out_path ):
-                    os.makedirs( out_path )
+            # create out path if required
+            if not os.path.exists( out_path ):
+                os.makedirs( out_path )
 
-                # setup input and output
-                app.SetParameterString( 'in', image )
-                app.SetParameterString( 'out', out_pathname + '?&gdal:co:TILED=YES' )
+            # setup input and output
+            app.SetParameterString( 'in', image )
+            app.SetParameterString( 'out', out_pathname + '?&gdal:co:TILED=YES' )
+
+            # copy corner coordinates of aoi
+            if coords is not None: 
+
                 app.SetParameterString( 'mode', 'extent' )
 
-                # copy corner coordinates of aoi
                 app.SetParameterFloat( 'mode.extent.ulx', coords[ 0 ] )
                 app.SetParameterFloat( 'mode.extent.uly', coords[ 1 ] )
                 app.SetParameterFloat( 'mode.extent.lrx', coords[ 2 ] )
                 app.SetParameterFloat( 'mode.extent.lry', coords[ 3 ] )
 
-                # execute download
-                with redirect_stdout( self._log ), redirect_stderr( self._log ):
-                    app.ExecuteAndWriteOutput()
+            # add channels argument
+            if channels is not None:
+                app.SetParameterStringList('cl', ' '.join([ 'Channel' + str(i) for i in channels ] ) )
+
+            # execute download
+            with redirect_stdout( self._log_file ), redirect_stderr( self._log_file ):
+                app.ExecuteAndWriteOutput()
 
         return out_pathname
 
@@ -387,9 +392,35 @@ class Dataset:
                     app.SetParameterString('method', self._pan_method )
 
             # generate pansharpen images
-            with redirect_stdout( self._log ), redirect_stderr( self._log ):
+            with redirect_stdout( self._log_file ), redirect_stderr( self._log_file ):
                 app.ExecuteAndWriteOutput()
 
+        return out_pathname
+
+    
+    def convertImage( self, pathname, out_path, options=None ):
+
+        """
+        convert image with gdal translate functionality
+        """
+
+        # create output pathname
+        out_pathname = os.path.join( out_path, os.path.basename( pathname ) )
+        if not os.path.exists( out_pathname ):
+
+            # open existing image
+            src_ds = gdal.Open( pathname, gdal.GA_ReadOnly )
+            if src_ds is not None:
+
+                # create out path if required
+                if not os.path.exists( out_path ):
+                    os.makedirs( out_path )
+
+                # execute translation - report error to log
+                ds = gdal.Translate( out_pathname, src_ds, options=gdal.TranslateOptions(creationOptions=options ) )
+                if ds is None and self._log_file is not None:
+                    self._log_file.write( 'Error converting {} -> {} {}'.format ( pathname, out_pathname, ','.join( options ) ) )
+                    
         return out_pathname
 
 
@@ -421,7 +452,7 @@ class Dataset:
                 app.SetParameterString('elev.geoid', self._geoid_pathname )
 
             # generate pansharpen images
-            with redirect_stdout( self._log ), redirect_stderr( self._log ):
+            with redirect_stdout( self._log_file ), redirect_stderr( self._log_file ):
                 app.ExecuteAndWriteOutput()
 
         return out_pathname
@@ -454,8 +485,7 @@ class Dataset:
                 app.SetParameterString('method', self._pan_method )
 
             # generate pansharpen images
-            with redirect_stdout( self._log ), redirect_stderr( self._log ):
+            with redirect_stdout( self._log_file ), redirect_stderr( self._log_file ):
                 app.ExecuteAndWriteOutput()
 
         return out_pathname
-

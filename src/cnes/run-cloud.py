@@ -8,12 +8,16 @@ from spot import Spot
 from pleiades import Pleiades
 from dataset import Dataset
 
+from src.utility import log
 from src.utility import parser
 from src.utility.gsclient import GsClient
 
 
 def applyFilters( blobs, args ):
 
+    """
+    parse bucket name and prefix from uri string
+    """
 
     def validTile( blob ):
 
@@ -50,10 +54,6 @@ def applyFilters( blobs, args ):
 
         return valid 
 
-
-    """
-    parse bucket name and prefix from uri string
-    """
 
     # for each blob name
     results = []
@@ -118,7 +118,6 @@ def getRoiTiles( roi ):
                 tiles.append ( 'E{:03d}N{:02d}'.format ( lon, lat ) )
 
     # confirm filter
-    print ( 'Filtering on tiles: {}'.format( tiles ) )
     return tiles
 
 
@@ -148,12 +147,17 @@ def parseArguments(args=None):
     parser.add_argument( 'download_path', action="store" )
     parser.add_argument('-t','--tles', nargs='+', help='tles', type=int, required=True )
 
-    # options
+    # filter options
     parser.add_argument('-s','--start_dt', type=validDateTimeArgument, help='start datetime', default=None )
     parser.add_argument('-e','--end_dt', type=validDateTimeArgument, help='end datetime', default=None )
     
     parser.add_argument('-roi', nargs=4,default=None, action="store", type=int )
     parser.add_argument('-tiles', nargs='+', default=None, action="store" )
+
+    # runtime performance
+    parser.add_argument('-log_path', default='.', action="store" )
+    parser.add_argument('-chunk_size', default=None, action="store", type=int )
+    parser.add_argument('-ram', default=4096, action="store", type=int )
 
     # elevation data
     parser.add_argument('-dem_path', default=None, action="store" )
@@ -170,35 +174,65 @@ def main():
 
     # parse arguments
     args = parseArguments()
+    
+    # construct logger
+    logger = log.getFileLogger( 'run-cloud', os.path.join( args.log_path, 'run-cloud.log' ) )
 
+    # writeback args to log file
+    logger.info( '******************** process start ********************')
+    logger.info( 'bucket uri: {}'.format( args.key_pathname ) )
+    logger.info( 'authentication key: {}'.format( args.key_pathname ) )
+    logger.info( 'download path: {}'.format( args.download_path ) )
+    logger.info( 'dem path: {}'.format( args.dem_path ) )
+    logger.info( 'geoid pathname: {}'.format( args.geoid_pathname ) )
+
+    logger.info( 'otb ram: {ram} (MB)'.format( ram='default' if args.ram is None else int( args.ram ) ) )
+    logger.info( 'gcs chunk size: {chunk} (MB)'.format( chunk='default' if args.chunk_size is None else int( args.chunk_size ) ) )
+
+    # convert roi into corresponding tile strings
     if args.roi is not None:
         args.tiles = getRoiTiles( args.roi )
+
+    # filters
+    logger.info( 'tles: {}'.format( ','.join( [ str(i) for i in args.tles ] ) ) )
+    logger.info( 'tiles: {tiles}'.format( tiles='n/a' if args.tiles is None else ','.join( args.tiles ) ) )
+    logger.info( 'start datetime: {dt}'.format( dt='n/a' if args.start_dt is None else args.start_dt ) )
+    logger.info( 'end datetime: {dt}'.format( dt='n/a' if args.end_dt is None else args.end_dt ) )
 
     # parse uri
     bucket, prefix = parseUri( args.uri )
     if bucket is not None:
 
+        # update credentials
         if os.path.exists( args.key_pathname ):
             GsClient.updateCredentials( args.key_pathname )
 
         # open client
-        client = GsClient( bucket, chunk_size=2097152 )  # 1024 * 1024 B * 2 = 2 MB
+        client = GsClient( bucket, chunk_size=args.chunk_size )
         for tle in args.tles:
 
             # retrieve list of blobs in prefix + tle directory            
             bucket_path = '{}/{}'.format( prefix, str( tle ) ).lstrip('/')
 
             blobs = client.getBlobNameList( bucket_path, [ '.zip' ] )
+            logger.info( 'blobs found: {}'.format( str( len( blobs ) ) ) )
+
+            # apply filters to blob list
             blobs = applyFilters( blobs, args )
+            logger.info( 'blobs after filtering: {}'.format( str( len( blobs ) ) ) )
 
             for blob in blobs:
 
                 # download blob to local file system
+                logger.info( 'downloading {} -> {}'.format( blob, args.download_path ) )
                 scene = client.downloadBlob( blob, args.download_path )
+                logger.info( '... OK' )
 
                 # get dataset id
                 _name = Dataset.getClassName( scene )
                 if _name is not None:
+
+                    logger.info( 'processing scene: {}'.format( scene ) )
 
                     # create object and process ard
                     _class = globals()[ _name ]            
@@ -206,9 +240,12 @@ def main():
                                     dem_path=args.dem_path,
                                     geoid_pathname=args.geoid_pathname,
                                     pan_method='bayes',
-                                    roi=args.roi )
+                                    roi=args.roi,
+                                    log_path=args.log_path,
+                                    ram=args.ram )
 
                     out_files = obj.processToArd()
+                    logger.info( '... OK' )
 
                     # upload files
                     for f in out_files:
@@ -217,7 +254,9 @@ def main():
                         upload_path = '{}/{}'.format( bucket_path, parser.getDateTimeString( f ) )
                         upload_path = upload_path.replace( 'raw', 'ard' )
 
+                        logger.info( 'uploading {} -> {}'.format( f, upload_path ) )
                         client.uploadFile( f, prefix=upload_path, flatten=True )
+                        logger.info( '... OK' )
 
     return
 
