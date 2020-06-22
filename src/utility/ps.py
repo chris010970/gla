@@ -17,7 +17,7 @@ def execute( name, arguments, logger = None ):
     return out, err, code
 
 
-def extractZip( pathname, out_path ):
+def extractZip( pathname, out_path, overwrite=False ):
 
     """
     execute zip archive to out path
@@ -27,9 +27,13 @@ def extractZip( pathname, out_path ):
     if not os.path.exists( out_path ):
         os.makedirs( out_path )
 
+    # optionally apply overwrite 
+    if overwrite:
+        out_path = '-o{}'.format( out_path )
+
     # run 7zip to extract 
     pname = 'C:\\Program Files\\7-Zip\\7z.exe'
-    out, err, code = execute( pname, [ 'x', pathname, '-o{}'.format( out_path ), '-y' ] )
+    out, err, code = execute( pname, [ 'x', pathname, out_path, '-y' ] )
 
     return out, err, code
 

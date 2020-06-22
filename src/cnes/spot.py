@@ -1,12 +1,8 @@
 import os
 
-# otb imports
-import otbApplication
-
 # local imports
 from dataset import Dataset
 from src.utility import ps
-
 
 class Spot ( Dataset ):
 
@@ -29,13 +25,15 @@ class Spot ( Dataset ):
                         }
 
         # get platform and tle
-        self._platform = self.getPlatform( scene, r'_SPOT[\d]_' )
+        platform = self.getPlatform( scene, r'_DS_SPOT[\d]_' )
+        self._platform = platform[ platform.find( 'SPOT') :  ]
+
         self._tle = self._norad_id [ self._platform ]
 
         return
 
 
-    def processToArd( self, ard_path ):
+    def processToArd( self ):
 
         """
         manage processing from raw dataset to ard
@@ -73,11 +71,14 @@ class Spot ( Dataset ):
                     out_path = os.path.join( root_path, 'roi/{}'.format( _id ) )
                     mosaic[ _id ] = self.getRoiImage( mosaic[ _id ], out_path )
 
-            # create pansharpened image
-            # ?&gdal:co:COMPRESS=LZW&gdal:co:TILED=YES
+            # superimpose multispectral image on panchromatic geometry
+            out_path = os.path.join( root_path, 'pan' )
+            mosaic[ 'MS' ] = self.getSuperimposedImage( mosaic, out_path )
+
+            # generate pansharpened image
             out_path = os.path.join( root_path, 'pan' )
             pan_image = self.getPansharpenImage( mosaic, out_path )
 
 
-        return
-
+        # return pansharpened image and multispectral mosaic
+        return pan_image, mosaic[ 'MS' ]

@@ -1,12 +1,8 @@
 import os
 
-# otb imports
-import otbApplication
-
 # local imports
 from dataset import Dataset
 from src.utility import ps
-
 
 class Pleiades ( Dataset ):
 
@@ -34,7 +30,7 @@ class Pleiades ( Dataset ):
         return
 
 
-    def processToArd( self, ard_path ):
+    def processToArd( self ):
 
         """
         manage processing from raw dataset to ard
@@ -49,7 +45,6 @@ class Pleiades ( Dataset ):
 
         # extract dataset to tmp path
         out, err, code = ps.extractZip( self._scene, path )
-        #code = 0
         if code == 0:
         
             # get image list and corresponding srtm tiles
@@ -81,5 +76,7 @@ class Pleiades ( Dataset ):
             out_path = os.path.join( root_path, 'pan' )
             pan_image = self.getPansharpenImage( mosaic, out_path )
 
-        return
+
+        # return pansharpened image and multispectral mosaic
+        return pan_image, mosaic[ 'MS' ]
 

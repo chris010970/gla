@@ -8,13 +8,14 @@ from datetime import datetime
 from contextlib import redirect_stdout
 from contextlib import redirect_stderr
 
-# otb imports
-import otbApplication
-
 # local imports
 from src.utility import ps
 from src.utility import parser
 from src.utility.bbox import BBox
+
+# otb imports
+import otbApplication
+
 
 class Dataset:
 
@@ -61,27 +62,32 @@ class Dataset:
 
         # capture stdout  
         log_pathname = os.path.join( log_path, os.path.basename( scene ).replace( '.zip', '.log' ) )  
-        self._log = open( log_pathname, 'w', buffering=1 )
+        self._log = open( log_pathname, 'a+', buffering=1 )
 
         return
 
 
     @staticmethod
-    def getId( scene ):
+    def getClassName( scene ):
 
         """
         get identity of dataset
         """
 
-        _id = None
-        for item in[ 'PHR', 'SPOT' ]:
+        # ids mapped to class names
+        class_map = {   'PHR' : 'Pleiades',
+                        'SPOT' : 'Spot'
+         }
+
+        _name = None
+        for key, value in class_map.items():
 
             # spot or pleiades dataset
-            if item in os.path.basename( scene ):
-                _id = item
+            if key in os.path.basename( scene ):
+                _name = value
                 break
 
-        return _id
+        return _name
 
 
     def getSubPath( self ):
@@ -91,7 +97,7 @@ class Dataset:
         """
 
         # construct unique tle / datetime folder name
-        return os.path.join( self._tle, self._datetime )
+        return os.path.join( str( self._tle ), self._datetime )
 
 
     def getDateTimeString( self, scene ):
