@@ -222,7 +222,7 @@ class Dataset:
         return
 
 
-    def getCalibratedImages( self, images, out_path, level='toa', milli=True ):
+    def getCalibratedImages( self, images, out_path, level='toa' ):
 
         """
         generate optical calibration images
@@ -248,9 +248,8 @@ class Dataset:
                 app.SetParameterString('out', out_pathname + '?&gdal:co:TILED=YES' )
 
                 # output to 0 -> 1000 16bit rather than 0 -> 1.0 32bit float
-                app.SetParameterString('milli', str( milli ) )            
-                if milli:
-                    app.SetParameterOutputImagePixelType('out', otbApplication.ImagePixelType_uint16 )
+                app.SetParameterString('milli', 'true' )            
+                app.SetParameterOutputImagePixelType('out', otbApplication.ImagePixelType_uint16 )
 
                 # execute and write products
                 with redirect_stdout( self._log_file ): #, redirect_stderr( self._log_file ):
@@ -300,6 +299,8 @@ class Dataset:
                     # initialise arguments
                     app.SetParameterStringList('il', images )
                     app.SetParameterString('out', out_pathname + '?&gdal:co:TILED=YES' )
+                    app.SetParameterOutputImagePixelType('out', otbApplication.ImagePixelType_uint16 )
+
                     app.SetParameterInt('cols', ncols )
                     app.SetParameterInt('rows', nrows )
 
@@ -339,6 +340,7 @@ class Dataset:
             # setup input and output
             app.SetParameterString( 'in', image )
             app.SetParameterString( 'out', out_pathname + '?&gdal:co:TILED=YES' )
+            app.SetParameterOutputImagePixelType('out', otbApplication.ImagePixelType_uint16 )
 
             # copy corner coordinates of aoi
             if coords is not None: 
@@ -382,6 +384,7 @@ class Dataset:
             app.SetParameterString('inp', images[ 'P' ] )
             app.SetParameterString('inxs', images[ 'MS' ] )
             app.SetParameterString('out', out_pathname + '?&gdal:co:TILED=YES' )
+            app.SetParameterOutputImagePixelType('out', otbApplication.ImagePixelType_uint16 )
 
             # configure elevation parameters
             if self._dem_path is not None and self._geoid_pathname is not None:
@@ -450,6 +453,7 @@ class Dataset:
             app.SetParameterString('inr', images[ 'P' ] )
             app.SetParameterString('inm', images[ 'MS' ] )
             app.SetParameterString('out', out_pathname + '?&gdal:co:TILED=YES' )
+            app.SetParameterOutputImagePixelType('out', otbApplication.ImagePixelType_uint16 )
 
             # configure elevation parameters
             if self._dem_path is not None and self._geoid_pathname is not None:
@@ -483,7 +487,9 @@ class Dataset:
             # initialise parameters
             app.SetParameterString('inp', images[ 'P' ] )
             app.SetParameterString('inxs', images[ 'MS' ] )
-            app.SetParameterString('out', out_pathname + '?&gdal:co:TILED=YES&gdal:co:COMPRESS=DEFLATE&gdal:co:BIGTIFF=YES' )
+            #app.SetParameterString('out', out_pathname + '?&gdal:co:TILED=YES&gdal:co:COMPRESS=DEFLATE&gdal:co:BIGTIFF=YES' )
+            app.SetParameterString('out', out_pathname + '?&gdal:co:TILED=YES' )
+            app.SetParameterOutputImagePixelType('out', otbApplication.ImagePixelType_uint16 )
 
             # set method (rcs, lvms, bayes)
             if self._pan_method is not None:
