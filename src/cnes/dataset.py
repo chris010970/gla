@@ -2,6 +2,7 @@ import os
 import re
 import gdal
 import glob
+import shutil
 from datetime import datetime
 
 # logging
@@ -420,6 +421,10 @@ class Dataset:
                 ds = gdal.Translate( out_pathname, src_ds, options=gdal.TranslateOptions(creationOptions=options ) )
                 if ds is None and self._log_file is not None:
                     self._log_file.write( 'Error converting {} -> {} {}'.format ( pathname, out_pathname, ','.join( options ) ) )
+
+                # copy geom file
+                if os.path.exists( pathname.replace( '.TIF', '.geom' ) ):
+                    shutil.copy( pathname.replace( '.TIF', '.geom' ), out_path )
                     
         return out_pathname
 
