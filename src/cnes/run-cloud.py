@@ -258,6 +258,10 @@ def main():
                         client.uploadFile( f, prefix=upload_path, flatten=True )
                         logger.info( '... OK' )
 
+
+                # remove directory
+                shutil.rmtree( os.path.dirname ( scene ) )
+
     return
 
 

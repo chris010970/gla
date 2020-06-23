@@ -17,7 +17,7 @@ def execute( name, arguments, logger = None ):
     return out, err, code
 
 
-def extractZip( pathname, out_path, overwrite=False ):
+def extractZip( pathname, out_path, overwrite=True ):
 
     """
     execute zip archive to out path

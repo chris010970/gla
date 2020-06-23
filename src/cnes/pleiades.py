@@ -63,7 +63,7 @@ class Pleiades ( Dataset ):
 
                 # generate calibration images
                 out_path = os.path.join( root_path, 'cal/{}'.format( _id ) )
-                cal_images = self.getCalibratedImages( images[ _id ], out_path, milli=True ) 
+                cal_images = self.getCalibratedImages( images[ _id ], out_path ) 
 
                 # create mosaic 
                 out_path = os.path.join( root_path, 'mosaic/{}'.format( _id ) )
