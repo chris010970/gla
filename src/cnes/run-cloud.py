@@ -13,6 +13,29 @@ from src.utility import parser
 from src.utility.gsclient import GsClient
 
 
+def checkOutputExists( blobs, client ):
+
+    """
+    remove blobs whose output directory + files already exist
+    """
+
+    # for each blob name
+    results = []
+    for blob in blobs:
+
+        # get blobs in output directory
+        path = os.path.dirname( blob ).replace( 'raw', 'ard' )
+        out_blobs = client.getBlobNameList( path, [ '.TIF' ] )
+
+        # no blobs - no output
+        if len ( out_blobs ) == 0:
+            results.append( blob )
+        else:
+            print ( 'output exists: {}', path )
+
+    return results
+
+
 def applyFilters( blobs, args ):
 
     """
@@ -220,6 +243,10 @@ def main():
             # apply filters to blob list
             blobs = applyFilters( blobs, args )
             logger.info( 'blobs after filtering: {}'.format( str( len( blobs ) ) ) )
+
+            # check output files already exist
+            blobs = checkOutputExists( blobs, client )
+            logger.info( 'blobs after output check: {}'.format( str( len( blobs ) ) ) )
 
             for blob in blobs:
 
