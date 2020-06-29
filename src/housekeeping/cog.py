@@ -1,4 +1,5 @@
 import os
+import pdb
 import gdal
 import shutil
 import argparse
@@ -7,7 +8,7 @@ from src.utility import parser
 from src.utility.gsclient import GsClient
 
 
-def convertToCog( pathname, out_pathname, options ):
+def convertToCog( pathname, out_pathname, creationOptions ):
 
     """
     convert image to COG with gdal translate functionality
@@ -23,7 +24,7 @@ def convertToCog( pathname, out_pathname, options ):
             os.makedirs( out_path )
 
         # execute translation - report error to log
-        gdal.Translate( out_pathname, src_ds, format='COG', options=gdal.TranslateOptions(creationOptions=options ) )
+        gdal.Translate( out_pathname, src_ds, format='COG', creationOptions=creationOptions )
                 
     return
 
@@ -75,18 +76,22 @@ def main():
             for blob in blobs:
 
                 # download blob to local file system
+                print ( 'downloading: {}'.format ( blob ) )
+
                 pathname = client.downloadBlob( blob, args.download_path )
                 out_pathname = pathname.replace( 'ard', 'cog' )  
 
                 # convert to cog
+                print ( 'generating: {}'.format( out_pathname ) )
                 convertToCog(   pathname,  
                                 out_pathname,
-                                ['BIGTIFF=YES', 'COMPRESS=DEFLATE' ] )
+                                ['BIGTIFF=YES', 'COMPRESS=DEFLATE', 'NUM_THREADS=ALL_CPUS' ] )
 
                 # upload cog to bucket                       
                 upload_path = '{}/{}'.format( bucket_path, parser.getDateTimeString( out_pathname ) )
-                upload_path = upload_path.replace( 'ard', 'cog' )
+                upload_path = upload_path.replace( 'ard', 'cog' ) 
 
+                print( 'uploading: {}'.format( out_pathname ) )
                 client.uploadFile( out_pathname, prefix=upload_path, flatten=True )
                 
                 # remove download directory
