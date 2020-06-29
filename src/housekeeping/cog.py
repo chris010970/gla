@@ -1,5 +1,6 @@
 import os
 import gdal
+import shutil
 import argparse
 
 from src.utility import parser
@@ -87,7 +88,9 @@ def main():
                 upload_path = upload_path.replace( 'ard', 'cog' )
 
                 client.uploadFile( out_pathname, prefix=upload_path, flatten=True )
-
+                
+                # remove download directory
+                shutil.rmtree( args.download_path )
                 
     return
 
