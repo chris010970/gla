@@ -37,6 +37,7 @@ def parseArguments(args=None):
     # parse command line arguments
     parser = argparse.ArgumentParser(description='process-ard')
     parser.add_argument( 'uri', action="store" )
+    parser.add_argument( 'key_pathname', action="store" )
     parser.add_argument( 'download_path', action="store" )
     parser.add_argument('-t','--tles', nargs='+', help='tles', type=int, required=True )
     parser.add_argument('-chunk_size', default=None, action="store", type=int )
@@ -57,6 +58,10 @@ def main():
     # parse uri
     bucket, prefix = GsClient.parseUri( args.uri )
     if bucket is not None:
+
+        # update credentials
+        if os.path.exists( args.key_pathname ):
+            GsClient.updateCredentials( args.key_pathname )
 
         # open client
         client = GsClient( bucket, chunk_size=args.chunk_size )
