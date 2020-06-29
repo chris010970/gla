@@ -1,0 +1,21 @@
+repository:
+    name: "spot_6"
+    keywords: "optical"
+    path: "d:\\data\\scratch\\ssgp\\raw"
+    templates:
+        preprocess: "d:\\data\\sql\\dbingest-raster-preprocess.sql"
+        postprocess: "d:\\data\\sql\\dbingest-raster-postprocess.sql"
+    servers:
+      - host: "localhost"
+        database: "gla"
+        user: "sac"
+        password: "sac"        
+    products:
+      - name: "ard"
+        description: "pansharpen 0.5m"
+        keywords: "ard"
+        path: "(38012|39019).*$"
+        measurements:
+          - name: "pan"
+            src: "*_PAN_*.TIF"
+            units: "milli"
