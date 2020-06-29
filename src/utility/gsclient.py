@@ -33,6 +33,33 @@ class GsClient:
         return
 
 
+    @staticmethod
+    def parseUri( uri ):
+
+        """
+        parse bucket name and prefix from uri string
+        """
+
+        bucket = None
+
+        # check gcs compliant
+        drive = 'gs://'
+        if drive in uri:
+            
+            # look for prefix
+            tail = uri[ len( drive )  : ]
+            tokens = tail.split( '/' )
+
+            bucket = tokens[ 0 ]
+            prefix = ''
+
+            # retrieve prefix
+            if len( tokens ) > 1:
+                prefix = '/'.join( tokens[ 1 : ] )
+
+        return bucket, prefix        
+
+
     def uploadFile( self, pathname, prefix=None, flatten=False ):
 
         """

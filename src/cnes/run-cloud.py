@@ -92,32 +92,6 @@ def applyFilters( blobs, args ):
     return results
 
 
-def parseUri( uri ):
-
-    """
-    parse bucket name and prefix from uri string
-    """
-
-    bucket = None
-
-    # check gcs compliant
-    drive = 'gs://'
-    if drive in uri:
-        
-        # look for prefix
-        tail = uri[ len( drive )  : ]
-        tokens = tail.split( '/' )
-
-        bucket = tokens[ 0 ]
-        prefix = ''
-
-        # retrieve prefix
-        if len( tokens ) > 1:
-            prefix = '/'.join( tokens[ 1 : ] )
-
-    return bucket, prefix        
-
-
 def getRoiTiles( roi ):
 
     """
@@ -223,7 +197,7 @@ def main():
     logger.info( 'end datetime: {dt}'.format( dt='n/a' if args.end_dt is None else args.end_dt ) )
 
     # parse uri
-    bucket, prefix = parseUri( args.uri )
+    bucket, prefix = GsClient.parseUri( args.uri )
     if bucket is not None:
 
         # update credentials
