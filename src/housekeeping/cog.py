@@ -29,6 +29,28 @@ def convertToCog( pathname, out_pathname, creationOptions ):
     return
 
 
+def checkOutputExists( blobs, client ):
+
+    """
+    remove blobs whose output directory + files already exist
+    """
+
+    # for each blob name
+    results = []
+    for blob in blobs:
+
+        # get blobs in output directory
+        path = os.path.dirname( blob ).replace( 'raw', 'ard' )
+        out_blobs = client.getBlobNameList( path, [ '.TIF' ] )
+
+        # no blobs - no output
+        if len ( out_blobs ) == 0:
+            results.append( blob )
+        else:
+            print ( 'output exists: {}', path )
+
+    return results
+
 
 def parseArguments(args=None):
 
@@ -72,6 +94,11 @@ def main():
             # retrieve list of blobs in prefix + tle directory            
             bucket_path = '{}/{}'.format( prefix, str( tle ) ).lstrip('/')
             blobs = client.getBlobNameList( bucket_path, [ '.TIF' ] )
+            print( 'blobs found: {}'.format( str( len( blobs ) ) ) )
+
+            # check output files already exist
+            blobs = checkOutputExists( blobs, client )
+            print( 'blobs after output check: {}'.format( str( len( blobs ) ) ) )
 
             for blob in blobs:
 
