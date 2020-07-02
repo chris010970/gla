@@ -235,7 +235,7 @@ def main():
 
                     logger.info( 'processing scene: {}'.format( scene ) )
 
-                    # create object and process ard
+                    # create object
                     _class = globals()[ _name ]            
                     obj = _class (  scene,
                                     dem_path=args.dem_path,
@@ -244,20 +244,35 @@ def main():
                                     roi=args.roi,
                                     log_path=args.log_path,
                                     ram=args.ram )
+                    try:
 
-                    out_files = obj.processToArd()
-                    logger.info( '... OK' )
+                        # execute process to ard
+                        out_files = obj.processToArd()
+                        logger.info( '... OK' )
+
+                    except Exception as e:
+
+                        # handle exception
+                        logger.info( '... ERROR: {} {} {}'.format( scene, e.message, e.args ) )
+                        out_files = None
+
+                    finally:
+
+                        # mark object for deletion
+                        obj = None
 
                     # upload files
-                    for f in out_files:
+                    if out_files is not None:
 
-                        # construct paths                        
-                        upload_path = '{}/{}'.format( bucket_path, parser.getDateTimeString( f ) )
-                        upload_path = upload_path.replace( 'raw', 'ard' )
+                        for f in out_files:
 
-                        logger.info( 'uploading {} -> {}'.format( f, upload_path ) )
-                        client.uploadFile( f, prefix=upload_path, flatten=True )
-                        logger.info( '... OK' )
+                            # construct paths                        
+                            upload_path = '{}/{}'.format( bucket_path, parser.getDateTimeString( f ) )
+                            upload_path = upload_path.replace( 'raw', 'ard' )
+
+                            logger.info( 'uploading {} -> {}'.format( f, upload_path ) )
+                            client.uploadFile( f, prefix=upload_path, flatten=True )
+                            logger.info( '... OK' )
 
 
                 # remove directory

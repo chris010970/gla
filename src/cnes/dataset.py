@@ -219,6 +219,9 @@ class Dataset:
             with redirect_stdout( self._log_file ), redirect_stderr( self._log_file ):
                 app.ExecuteAndWriteOutput()
 
+            # free app
+            app = None
+
         return
 
 
@@ -257,6 +260,9 @@ class Dataset:
 
             # add to list
             out_images.append( out_pathname )
+
+        # free app
+        app = None
 
         return out_images
 
@@ -307,6 +313,9 @@ class Dataset:
                     # execute and write products
                     with redirect_stdout( self._log_file ), redirect_stderr( self._log_file ):
                         app.ExecuteAndWriteOutput()
+
+                # free app
+                app = None
 
             else:
                 
@@ -360,6 +369,9 @@ class Dataset:
             with redirect_stdout( self._log_file ), redirect_stderr( self._log_file ):
                 app.ExecuteAndWriteOutput()
 
+        # free app
+        app = None
+
         return out_pathname
 
 
@@ -399,6 +411,9 @@ class Dataset:
             with redirect_stdout( self._log_file ), redirect_stderr( self._log_file ):
                 app.ExecuteAndWriteOutput()
 
+        # free app
+        app = None
+
         return out_pathname
 
     
@@ -428,6 +443,9 @@ class Dataset:
                 # copy geom file
                 if os.path.exists( pathname.replace( '.TIF', '.geom' ) ):
                     shutil.copy( pathname.replace( '.TIF', '.geom' ), out_path )
+
+            # free src_ds
+            src_ds = None
                     
         return out_pathname
 
@@ -464,6 +482,9 @@ class Dataset:
             with redirect_stdout( self._log_file ), redirect_stderr( self._log_file ):
                 app.ExecuteAndWriteOutput()
 
+        # free app
+        app = None
+
         return out_pathname
 
 
@@ -498,5 +519,8 @@ class Dataset:
             # generate pansharpen images
             with redirect_stdout( self._log_file ), redirect_stderr( self._log_file ):
                 app.ExecuteAndWriteOutput()
+
+        # free app
+        app = None
 
         return out_pathname
