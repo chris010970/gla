@@ -137,7 +137,9 @@ class Server:
         """
 
         # standard argument list - tile size configurable
-        args = [ '-R', '-C', '-d', '-F' ]
+        # args = [ '-R', '-C', '-d', '-F' ]
+        args = [ '-R', '-d', '-F', '-Y' ]
+        # args = [ '-d', '-F', '-Y' ]
 
         args.extend( [ '-t', parameters[ 'TILE_SIZE' ] ] )
         args.append( parameters[ 'PATHNAME' ] )
@@ -151,8 +153,8 @@ class Server:
             with tempfile.TemporaryDirectory() as tmp_path:
 
                 # write raster2pgsql to file
-                with open( os.path.join( tmp_path, 'raster2pgsql.sql' ), "w" ) as fp:
-                    fp.write( out.decode( 'utf-8')  )
+                with open( os.path.join( tmp_path, 'raster2pgsql.sql' ), "wb" ) as fp:
+                    fp.write( out  )
 
                 # execute raster2pgsql commands 
                 out, error, code = self.executeTransactionFromFile( os.path.join( tmp_path, 'raster2pgsql.sql' ) )

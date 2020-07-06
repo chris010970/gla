@@ -48,14 +48,14 @@ class Product:
         return self._obj[ 'keywords' ]
 
 
-    def getPath( self ):
+    def getPattern( self ):
 
         """
-        get path
+        get source
         """
 
-        # get path regexp
-        return self._obj[ 'path' ]
+        # get pattern regexp
+        return self._obj[ 'pattern' ]
 
 
     def getTileSize( self ):
@@ -64,7 +64,7 @@ class Product:
         get tile size
         """
 
-        return self._obj[ 'tile_size' ] if 'tile_size' in self._obj else '256x256'
+        return self._obj[ 'tile_size' ] if 'tile_size' in self._obj else '512x512'  # default gdal tile size
 
 
     def getMeasurementNameList( self ):
