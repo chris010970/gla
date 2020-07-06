@@ -1,19 +1,21 @@
 import os
+import re
 
 from pathlib import Path
 from google.cloud import storage
 
 class GsClient:
 
-    def __init__( self, bucket, chunk_size=None ):
+    def __init__( self, name, chunk_size=None ):
 
         """
         constructor
         """
 
         # initialise sdk attributes
+        self._name = name
         self._client = storage.Client()
-        self._bucket = self._client.get_bucket( bucket )
+        self._bucket = self._client.get_bucket( name )
 
         # set default chunk size
         if chunk_size is not None:
@@ -29,8 +31,20 @@ class GsClient:
         update environmental variable
         """
 
+        # add credentials to environment
         os.environ["GOOGLE_APPLICATION_CREDENTIALS"]=pathname
         return
+
+
+    @staticmethod
+    def isUri( uri ):
+
+        """
+        check google storage uri
+        """
+
+        # check uri
+        return 'gs://' in uri
 
 
     @staticmethod
@@ -40,7 +54,7 @@ class GsClient:
         parse bucket name and prefix from uri string
         """
 
-        bucket = None
+        bucket = None; prefix = None
 
         # check gcs compliant
         drive = 'gs://'
@@ -122,10 +136,10 @@ class GsClient:
         return pathname
 
 
-    def getBlobNameList( self, prefix, match_list ):
+    def getBlobNameList( self, prefix, pattern='.*' ):
 
         """
-        get blob
+        get blob names matching regexp
         """
 
         match_names = []
@@ -134,18 +148,22 @@ class GsClient:
         blobs = self._bucket.list_blobs(prefix=prefix, delimiter=None)
         for blob in blobs:
 
-            # apply match to bucket files
+            # convert blob to dict
             d = self.getBlobAsDict( blob )
-            if any( f in d[ 'name' ] for f in match_list ):
+
+            # apply regexp match to key
+            x = re.search( pattern,  d[ 'name' ] )
+            if x is not None:                
                 match_names.append( d[ 'name' ] )
 
+        
         return match_names
 
 
-    def getBlobList( self, prefix, match_list ):
+    def getBlobList( self, prefix, pattern='.*' ):
 
         """
-        get blob
+        get blobs whose name matching regexp
         """
 
         match_blobs = []
@@ -156,7 +174,10 @@ class GsClient:
 
             # apply match to bucket files
             d = self.getBlobAsDict( blob )
-            if any( f in d[ 'name' ] for f in match_list ):
+
+            # apply regexp match to key
+            x = re.search( pattern,  d[ 'name' ] )
+            if x is not None:                
                 match_blobs.append( d )
 
         return match_blobs
@@ -258,3 +279,19 @@ class GsClient:
             'encryptionAlgorithm': blob._properties.get('customerEncryption', {}).get('encryptionAlgorithm', ''),
             'encryptionKeySHA256': blob._properties.get('customerEncryption', {}).get('keySha256', ''),
         }
+
+
+    def getImageUriList( self, prefix, pattern=None ):
+
+        """
+        get blob
+        """
+
+        uris = []
+
+        # convert matching blob names to gdal virtual fs uris
+        keys = self.getBlobNameList( prefix, pattern=pattern )
+        for key in keys:
+            uris.append( '/vsigs/{}/{}'.format( self._name, key ) )
+
+        return uris
