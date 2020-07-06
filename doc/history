@@ -1,0 +1,767 @@
+    1  ls
+    2  wget
+    3  sudo yum install wget
+    4  wget https://www.orfeo-toolbox.org/packages/OTB-7.1.0-Linux64.run
+    5  ls
+    6  chmod a+x
+    7  chmod a+x OTB-7.1.0-Linux64.run 
+    8  ls
+    9  ./OTB-7.1.0-Linux64.run 
+   10  ls
+   11  cd OTB-7.1.0-Linux64/bin/
+   12  ls
+   13  ./otbcli_OpticalCalibration 
+   14  sudo yum search python3
+   15  sudo yum search python3 | more
+   16  sudo yum install python3
+   17  pip --version
+   18  pip3 --version
+   19  python --version
+   20  which python
+   21  ls -l  /bin/python
+   22  which python2
+   23  ls /bin
+   24  ls /bin/pyth*
+   25  ls -l /bin/pyth*
+   26  sudo rm /bin/python
+   27  sudo ln -s /bin/python3 /bin/python
+   28  python --version
+   29  cd ~
+   30  ls
+   31  rm -rf OTB-7.1.0-Linux64
+   32  ./OTB-7.1.0-Linux64.run 
+   33  pip -version
+   34  pip3
+   35  pip3 install numpy
+   36  pip3 install numpy --user
+   37  rm -rf OTB-7.1.0-Linux64
+   38  ls
+   39  ./OTB-7.1.0-Linux64.run 
+   40  source OTB-7.1.0-Linux64/otbenv.profile 
+   41  python
+   42  sudo yum history
+   43  sudo yum list history
+   44  yum
+   45  wget https://www.python.org/ftp/python/3.5.9/Python-3.5.9.tgz
+   46  mkdir src
+   47  ls
+   48  mv Python-3.5.9.tgz sc
+   49  rm sc
+   50  wget https://www.python.org/ftp/python/3.5.9/Python-3.5.9.tgz
+   51  mv Python-3.5.9.tgz src/
+   52  cd src/
+   53  ls
+   54  tar xvfz Python-3.5.9.tgz 
+   55  cd Python-3.5.9
+   56  ls
+   57  ./configure --enable-optimizations
+   58  sudo yum search gcc-c
+   59  sudo yum install gcc-c++
+   60  ./configure --enable-optimizations
+   61  make
+   62  make clean
+   63  make altinstall
+   64  sudo make altinstall
+   65  python3.5
+   66  pip
+   67  pip3
+   68  pip3.5
+   69  ls /usr/bin/py*
+   70  ls -l /usr/bin/py*
+   71  sudo make uninstall
+   72  ./configure --enable-optimizations --with-ensurepip=install
+   73  sudo yum install openssl
+   74  sudo yum install openssl-devel
+   75  sudo yum install openssl-libs
+   76  ./configure --enable-optimizations --with-ensurepip=install
+   77  sudo make altinstall
+   78  pip3.5 
+   79  pip3.5 install numpy --user
+   80  sudo pip3.5 install --upgrade pip
+   81  sudo /usr/local/bin/pip3.5 install --upgrade pip
+   82  which python2
+   83  ls /
+   84  ln -s /usr/local/bin/python3.5 /usr/bin/python3 
+   85  sudo ln -s /usr/local/bin/python3.5 /usr/bin/python3 
+   86  cd ..
+   87  ls
+   88  rm -rf OTB-7.1.0-Linux64
+   89  mkdir apps
+   90  cd apps/
+   91  mv ~/OTB-7.1.0-Linux64.run .
+   92  ./OTB-7.1.0-Linux64.run 
+   93  sudo cd /usr/lib
+   94  ls -l
+   95  cd /usr/lib
+   96  ls
+   97  ls /lib64
+   98  find /usr -name '*.a'
+   99  $PATH
+  100  sudo ln -s /usr/local/lib/libpython3.5m.a /usr/lib
+  101  ls /usr/lib/
+  102  cd ~
+  103  cd apps/
+  104  ls
+  105  rm OTB-7.1.0-Linux64
+  106  rm -rf OTB-7.1.0-Linux64
+  107  ./OTB-7.1.0-Linux64.run 
+  108  source OTB-7.1.0-Linux64/otbenv.profile 
+  109  python3.5
+  110  find /usr -name 'libpython3.5m.so*'
+  111  cd ~/src/Python-3.5.9
+  112  ls
+  113  ./configure --enable-optimizations --with-ensurepip=install --enable-shared --prefix=/usr/local LDFLAGS="-Wl,--rpath=/usr/local/lib"
+  114  make clean
+  115  sudo make clean
+  116  ./configure --enable-optimizations --with-ensurepip=install --enable-shared --prefix=/usr/local LDFLAGS="-Wl,--rpath=/usr/local/lib"
+  117  sudo make altinstall
+  118  find /usr -name 'libpython3.5m.so*'
+  119  sudo nano /etc/ld.so.conf.d/local.conf
+  120  nano
+  121  sudo yum install nano
+  122  sudo nano /etc/ld.so.conf.d/local.conf
+  123  sudo ldconfig
+  124  sudo nano /etc/ld.so.conf.d/local.conf
+  125  cd ..
+  126  cd ../apps/OTB-7.1.0-Linux64
+  127  ls
+  128  source otbenv.profile 
+  129  python3.5
+  130  fg
+  131  find /usr -name 'libpython3.5m.so*'
+  132  ln -s /usr/local/lib/libpython3.5m.so.1.0 /usr/local/lib/libpython3.5m.so.rh-python35-1.0
+  133  sudo ln -s /usr/local/lib/libpython3.5m.so.1.0 /usr/local/lib/libpython3.5m.so.rh-python35-1.0
+  134  python3.5
+  135  find /usr -name libpython3.5m.so.rh-python35-1.0
+  136  sudo ldconfig
+  137  sudo ldconfig -p
+  138  sudo ldconfig -p | more python
+  139  sudo ldconfig -p | grep python
+  140  sudo ldconfig
+  141  sudo ldconfig -p | grep python
+  142  ls
+  143  more otbenv.profile 
+  144  cd lib/python/
+  145  ls
+  146  more otbApplication.py 
+  147  ls
+  148  cd ..
+  149  ls
+  150  cd ..
+  151  ls
+  152  cd 
+  153  cd ..
+  154  cd sac/
+  155  ls
+  156  cd src/
+  157  ls
+  158  cd ../apps/
+  159  ls
+  160  more OTB-7.1.0-Linux64.run 
+  161  grep  libpython3.5m.so.rh-python35-1.0 *
+  162  grep -R  libpython3.5m.so.rh-python35-1.0 *
+  163  ls /usr/local/lib
+  164  ls
+  165  rm -rf OTB-7.1.0-Linux64
+  166  ls -l /usr/local/lib
+  167  ls
+  168  ./OTB-7.1.0-Linux64.run 
+  169  more OTB-7.1.0-Linux64.run 
+  170  echo PATH
+  171  echo $PATH
+  172  rm OTB-7.1.0-Linux64
+  173  rm -rf OTB-7.1.0-Linux64
+  174  ./OTB-7.1.0-Linux64.run 
+  175  ln -s /usr/local/lib/libpython3.5m.so.1.0 /home/sac/apps/OTB-7.1.0-Linux64/lib/libpython3.5m.so.1.0
+  176  python3.5
+  177  ln -s /usr/local/lib/libpython3.5m.so.1.0 /home/sac/apps/OTB-7.1.0-Linux64/lib/python/libpython3.5m.so.rh-python35-1.0
+  178  python3.5
+  179  fg
+  180  echo $LD_LIBRARY_PATH
+  181  export LD_LIBRARY_PATH=/usr/local/lib
+  182  python3.5
+  183  cd ../src/
+  184  sudo yum install git
+  185  git clone https://github.com/chris010970/gla.git
+  186  ls
+  187  mv Python-3.5.9.tgz Python-3.5.9
+  188  cd gla/
+  189  ls
+  190  cd src/
+  191  ls
+  192  cd cnes/
+  193  ls
+  194  python run.py 
+  195  pip3.5 install gdal --user
+  196  sudo yum search gdal
+  197  sudo yum install gdal gdal-d
+  198  gdalinfo
+  199  pip3.5 install gdal==1.11 --user
+  200  sudo yum search gdal
+  201  sudo yum install gdal-python
+  202  python3.5
+  203  pip3.5 install gdal==1.11 --user
+  204  find /usr -name 'cpl_port.h'
+  205  pip3.5 install --global-option=build_ext --global-option="-I/usr/include/gdal" gdal==1.11 --user
+  206  python3.5
+  207  python3.5 run.py 
+  208  cd ..
+  209  cd ~/apps/OTB-7.1.0-Linux64
+  210  ls
+  211  cd lib/
+  212  ls
+  213  cd ..
+  214  find . -name '*gdal*'
+  215  find . -name '*gdal*' | more
+  216  find . -name 'cpl_port.h'
+  217  sudo yum history list
+  218  sudo yum history info 14
+  219  sudo yum history info 13
+  220  sudo yum history undo 13
+  221  sudo yum history undo 14
+  222  bin/gdalinfo 
+  223  bin/gdalinfo --version
+  224  pip3.5 install --global-option=build_ext --global-option="-I/usr/include/gdal" gdal==3.0.2 --user
+  225  ls include/
+  226  pwd
+  227  pip3.5 install --global-option=build_ext --global-option="-I/home/sac/apps/OTB-7.1.0-Linux64/include" gdal==3.0.2 --user
+  228  find . -name 'gdal-config'
+  229  pip3.5 install --global-option=build_ext --global-option="-I/home/sac/apps/OTB-7.1.0-Linux64/include" gdal==3.0.2 --user
+  230  export CPLUS_INCLUDE_PATH=/home/sac/apps/OTB-7.1.0-Linux64/include
+  231  export C_INCLUDE_PATH=/home/sac/apps/OTB-7.1.0-Linux64/include
+  232  pip3.5 install --global-option=build_ext --global-option="-I/home/sac/apps/OTB-7.1.0-Linux64/include" gdal==3.0.2 --user
+  233  pip3.5 download  gdal==3.0.2 --user
+  234  pip3.5 download  gdal==3.0.2 
+  235  pip3.5 download  gdal==3.0.2  | more
+  236  pip3.5 download  gdal
+  237  pip3.5 download  gdal > out
+  238  ls
+  239  more out 
+  240  rm out 
+  241  ls
+  242  find . -name '*gdal*'
+  243  find . -name '*gdal*' | more
+  244  bin/gdalinfo 
+  245  bin/gdalinfo -version
+  246  bin/gdalinfo --version
+  247  wget https://github.com/OSGeo/gdal/releases/download/v3.0.2/gdal-3.0.2.tar.gz
+  248  ls
+  249  mv gdal-3.0.2.tar.gz ~/src
+  250  cd ~/src/
+  251  ls
+  252  tar xvfz gdal-3.0.2.tar.gz 
+  253  ls
+  254  cd gdal-3.0.2
+  255  ls
+  256  ./configure
+  257  sudo yum search proj
+  258  sudo yum search proj | more
+  259  sudo yum install proj proj-devel
+  260  ./configure
+  261  sudo ldconfig
+  262  sudo ldconfig -p | grep proj
+  263  ./configure
+  264  cd ..
+  265  wget https://download.osgeo.org/proj/proj-6.3.2.tar.gz
+  266  ls
+  267  tar xvfz proj-6.3.2.tar.gz 
+  268  cd proj-6.3.2
+  269  ls
+  270  ./configure
+  271  sudo yum search sqlite3
+  272  sudo yum install libsqlite3 libsqlite3-devel
+  273  sudo yum install libsqlite3x libsqlite3x-devel
+  274  ./configure
+  275  sudo yum history list
+  276  sudo yum history undo 18
+  277  cd ..
+  278  wget https://www.sqlite.org/2020/sqlite-autoconf-3320200.tar.gz
+  279  ls
+  280  tar xvfz sqlite-autoconf-3320200.tar.gz 
+  281  cd sqlite-autoconf-3320200
+  282  ls
+  283  ./configure
+  284  make
+  285  sudo make install
+  286  cd ../proj-6.3.2
+  287  ./configure
+  288  find /usr -name '*sqlite*'
+  289  sudo ldconfig 
+  290  ./configure
+  291  export SQLITE3_LIBS=/usr/local/lib
+  292  ./configure
+  293  make
+  294  ls
+  295  yum
+  296  sudo rm /bin/python
+  297  yum
+  298  sudo ln -s /bin/python2 /bin/python
+  299  yum
+  300  sudo yum list history
+  301  sudo yum history list
+  302  sudo yum history info 7
+  303  sudo yum history undo 7
+  304  sudo yum search python35
+  305  sudo yum search python3.5
+  306  sudo yum search python3
+  307  sudo yum search python3 | more
+  308                
+  309  ls /usr/local/lib
+  310  cd src/proj-6.3.2
+  311  ls
+  312  export SQLITE3_LIBS="-L/usr/local/lib -lsqlite3"
+  313  ls /usr/local/include/
+  314  export SQLITE3_CFLAGS="-I/usr/local/include"
+  315  ./CONFIGURE
+  316  ./configure
+  317  make clean
+  318  make
+  319  sudo make install
+  320  cd ..
+  321  cd gdal-3.0.2
+  322  ls
+  323  ./configure
+  324  ls /usr/local/lib
+  325  sudo ldconfig
+  326  ./configure --help
+  327  ./configure --help | more
+  328  ./configure --with-proj=/usr/local
+  329  more config.log 
+  330                     make
+  331  ./configure --with-proj=/usr/local
+  332  sudo yum install swif
+  333  sudo yum install swig swig-devel
+  334  ./configure --help
+  335  ./configure --help | more
+  336  python3.5
+  337  which python3.5
+  338  ./configure --with-proj=/usr/local --with-python=/usr/local/bin/python3.5
+  339  sudo yum search jasper
+  340  sudo yum install jasper jasper-devel
+  341  ./configure --with-proj=/usr/local --with-python=/usr/local/bin/python3.5
+  342  make
+  343  sudo make install
+  344  gdalinfo
+  345  sudo ldconfig
+  346  gdalinfo
+  347  find /usr -name 'gdal_array*'
+  348  python3.5
+  349  ls /usr/local/lib
+  350  find /usr -name 'libgdal.so.1'
+  351  sudo find /usr -name 'libgdal.so.1'
+  352  sudo ln -s /usr/local/lib/libgdal.so /usr/local/lib/libgdal.so.1
+  353  sudo ldconfig
+  354  python3.5
+  355  cd ~/apps/OTB-7.1.0-Linux64
+  356  ls
+  357  history | grep source
+  358  cd ..
+  359  source OTB-7.1.0-Linux64/otbenv.profile 
+  360  history | grep export
+  361  export LD_LIBRARY_PATH=/usr/local/lib
+  362  python3.5
+  363  cd ~/src/g
+  364  cd ~/src/gla/
+  365  ls
+  366  cd src/
+  367  ls
+  368  cd cnes/
+  369  ls
+  370  python --version
+  371  python3.5 --version
+  372  python3.5 run.py
+  373  python3.5
+  374  ls /home/sac/.local/lib/python3.5/site-packages/osgeo/_osr.cpython-35m-x86_64-linux-gnu.so
+  375  python3.5
+  376  ls /home/sac/.local/lib/python3.5/site-packages/
+  377  pip3.5 uninstall gdal
+  378  python3.5
+  379  python3.5 run.py 
+  380  cd ..
+  381  ls
+  382  cd ..
+  383  ls
+  384  pip3.5 install -e .
+  385  cd src/
+  386  ls
+  387  cd cnes/
+  388  python run.py 
+  389  python3.5 run.py 
+  390  pip3.5 install pyproj --user
+  391  python3.5 run.py 
+  392  pip3.5 install shapely --user
+  393  python3.5 run.py 
+  394  gcloud init
+  395  ls
+  396  mkdir ~/data
+  397  gsutil cp gs://gla-datastore001/pleiades/Pleiades_UKSA100_SO18034613-100-01_DS_PHR1A_201807021141528_FR1_PX_W007N57_0704_05734.zip ~/data/
+  398  ls
+  399  python3.5  
+  400  python3.5  run.py 
+  401  python3.5  run.py  ~/data/Pleiades_UKSA100_SO18034613-100-01_DS_PHR1A_201807021141528_FR1_PX_W007N57_0704_05734.zip 
+  402  nano run.py 
+  403  cd ../..
+  404  cd ../
+  405  rm -rf gla/
+  406  history | grep git
+  407  git clone https://github.com/chris010970/gla.git
+  408  cd gla/src/cnes/
+  409  ls
+  410  sudo mkdir /data
+  411  sudo chown sac:sac /data
+  412  mkdir /data/pleiades
+  413  mv ~/data/Pleiades_UKSA100_SO18034613-100-01_DS_PHR1A_201807021141528_FR1_PX_W007N57_0704_05734.zip /data/pleiades/
+  414  mkdir /data/ancillary
+  415  mkdir /data/ancillary/srtm
+  416  mkdir /data/ancillary/geoid
+  417  wget https://gitlab.orfeo-toolbox.org/orfeotoolbox/otb-data/-/raw/master/Input/DEM/egm96.grd
+  418  mv egm96.grd /data/ancillary/geoid/
+  419  python3.5 
+  420  python3.5 /data/pleiades/Pleiades_UKSA100_SO18034613-100-01_DS_PHR1A_201807021141528_FR1_PX_W007N57_0704_05734.zip -dem_path /data/ancillary/dem -geoid_pathname /data/ancillary/geoid/egm96.grd 
+  421  python3.5 run.py /data/pleiades/Pleiades_UKSA100_SO18034613-100-01_DS_PHR1A_201807021141528_FR1_PX_W007N57_0704_05734.zip -dem_path /data/ancillary/dem -geoid_pathname /data/ancillary/geoid/egm96.grd 
+  422  nano pleiades.py 
+  423  python3.5 run.py /data/pleiades/Pleiades_UKSA100_SO18034613-100-01_DS_PHR1A_201807021141528_FR1_PX_W007N57_0704_05734.zip -dem_path /data/ancillary/dem -geoid_pathname /data/ancillary/geoid/egm96.grd 
+  424  sudo yum search 7zip
+  425  sudo yum install p7zip
+  426  more ../utility/ps.py 
+  427  7za
+  428  7za | more
+  429  ls
+  430  nano ../utility/ps.py 
+  431  python3.5 run.py /data/pleiades/Pleiades_UKSA100_SO18034613-100-01_DS_PHR1A_201807021141528_FR1_PX_W007N57_0704_05734.zip -dem_path /data/ancillary/dem -geoid_pathname /data/ancillary/geoid/egm96.grd 
+  432  fg
+  433  cd ..
+  434  ls
+  435  cd cne
+  436  cd src
+  437  cd cnes
+  438  ls
+  439  nano pleiades.py 
+  440  python3.5 run.py /data/pleiades/Pleiades_UKSA100_SO18034613-100-01_DS_PHR1A_201807021141528_FR1_PX_W007N57_0704_05734.zip -dem_path /data/ancillary/dem -geoid_pathname /data/ancillary/geoid/egm96.grd  > out
+  441  more out 
+  442  otbcli_DownloadSRTMTiles 
+  443  more otbcli_DownloadSRTMTiles 
+  444  cd /home/sac/apps/OTB-7.1.0-Linux64/bin/
+  445  more otbcli
+  446  nano -c otbcli
+  447  ls
+  448  otbcli_DownloadSRTMTiles 
+  449  cd ..
+  450  ls
+  451  ls lib/
+  452  ls -l lib/libproj.so
+  453  cd ~/src/proj-6.3.2
+  454  sudo make uninstall
+  455  ls /usr/local/lib
+  456  cd ..
+  457  ls
+  458  cd gdal-3.0.2
+  459  ./configure --with-proj=/home/sac/apps/OTB-7.1.0-Linux64 --with-python=/usr/local/bin/python3.5
+  460  ls 
+  461  ls ~/apps/OTB-7.1.0-Linux64/include/
+  462  ./configure --help | more
+  463  CPPFLAGS="-I/opt/osgeo/proj4/include -I/opt/osgeo/curl/include -I/opt/osgeo/szip/include" LDFLAGS="-L/opt/osgeo/proj4/lib -L/opt/osgeo/curl/lib -L/opt/osgeo/szip/lib" ./configure --prefix=/opt/osgeo/gdal --with-geos=/opt/osgeo/geos/bin/geos-config --with-netcdf=/opt/osgeo/netcdf-c --with-pg=/usr/local/pgsql/bin/pg_config --with-hdf5=/opt/osgeo/hdf5 --with-python --with-proj=/opt/osgeo/proj4 --with-kea=/opt/osgeo/kealib/bin/kea-config
+  464  ls /home/sac/apps/OTB-7.1.0-Linux64/lib/
+  465  sudo nano /etc/ld.so.conf.d/otb.conf
+  466  sudo ldconfig
+  467  sudo ldconfig -p
+  468  sudo ldconfig -p | grep OTB
+  469  history | grep configure
+  470  ./configure
+  471  sudo ldconfig -p | grep proj
+  472  sudo rm /etc/ld.so.conf.d/otb.conf 
+  473  sudo ldconfig
+  474  ls /home/sac/apps/OTB-7.1.0-Linux64
+  475  ./configure --with-proj=/home/sac/apps/OTB-7.1.0-Linux64
+  476  CPPFLAGS="-I/home/sac/apps/OTB-7.1.0-Linux64/include" LDFLAGS="-L/home/sac/apps/OTB-7.1.0-Linux64/lib -lgeotiff" ./configure --with-proj=/home/sac/apps/OTB-7.1.0-Linux64
+  477   ./configure --with-proj=/home/sac/apps/OTB-7.1.0-Linux64 --with-geotiff=/home/sac/apps/OTB-7.1.0-Linux64
+  478   ./configure --with-proj=/home/sac/apps/OTB-7.1.0-Linux64 --with-geotiff=/home/sac/apps/OTB-7.1.0-Linux64 | more
+  479  history | grep configure
+  480   ./configure --with-proj=/home/sac/apps/OTB-7.1.0-Linux64 --with-geotiff=/home/sac/apps/OTB-7.1.0-Linux64 --with-python=/usr/local/bin/python3.5
+  481  make clean
+  482  sudo make clean
+  483   ./configure --with-proj=/home/sac/apps/OTB-7.1.0-Linux64 --with-geotiff=/home/sac/apps/OTB-7.1.0-Linux64 --with-python=/usr/local/bin/python3.5
+  484  make
+  485   ./configure --with-proj=/home/sac/apps/OTB-7.1.0-Linux64 --with-geotiff=/home/sac/apps/OTB-7.1.0-Linux64 -with-hdf5=/home/sac/apps/OTB-7.1.0-Linux64  --with-python=/usr/local/bin/python3.5
+  486  cd ~/apps/OTB-7.1.0-Linux64/bin/
+  487  cd ..
+  488  ls
+  489  cd ~/src/gdal-3.0.2
+  490   ./configure --with-proj=/home/sac/apps/OTB-7.1.0-Linux64 --with-geotiff=/home/sac/apps/OTB-7.1.0-Linux64 -with-hdf5=/home/sac/apps/OTB-7.1.0-Linux64  --with-python=/usr/local/bin/python3.5 | more
+  491   ./configure --with-proj=/home/sac/apps/OTB-7.1.0-Linux64 --with-geotiff=/home/sac/apps/OTB-7.1.0-Linux64 -with-hdf5=/home/sac/apps/OTB-7.1.0-Linux64  --with-python=/usr/local/bin/python3.5 
+  492   ./configure --with-proj=/home/sac/apps/OTB-7.1.0-Linux64 --with-geotiff=/home/sac/apps/OTB-7.1.0-Linux64 -with-hdf5=/home/sac/apps/OTB-7.1.0-Linux64  --with-python=/usr/local/bin/python3.5 > out
+  493  grep hdf out
+  494  sudo make clean
+  495  make
+  496  export LD_LIBRARY_PATH=/home/sac/apps/OTB-7.1.0-Linux64/lib/
+  497  make
+  498  sudo make install
+  499  sudo ldconfig
+  500  gdalinfo
+  501  cd ~/src/gla/src/cnes/
+  502  ls
+  503  history | grep run
+  504  python3.5 run.py /data/pleiades/Pleiades_UKSA100_SO18034613-100-01_DS_PHR1A_201807021141528_FR1_PX_W007N57_0704_05734.zip -dem_path /data/ancillary/dem -geoid_pathname /data/ancillary/geoid/egm96.grd  > out
+  505  history | grep LD_LIBRARY_PATH *
+  506  ls /usr/local/lib
+  507  cd src/proj-6.3.2
+  508  ls
+  509  export SQLITE3_LIBS="-L/usr/local/lib -lsqlite3"
+  510  ls /usr/local/include/
+  511  export SQLITE3_CFLAGS="-I/usr/local/include"
+  512  ./CONFIGURE
+  513  ./configure
+  514  make clean
+  515  make
+  516  sudo make install
+  517  cd ..
+  518  cd gdal-3.0.2
+  519  ls
+  520  ./configure
+  521  ls /usr/local/lib
+  522  sudo ldconfig
+  523  ./configure --help
+  524  ./configure --help | more
+  525  ./configure --with-proj=/usr/local
+  526  more config.log 
+  527                     make
+  528  ./configure --with-proj=/usr/local
+  529  sudo yum install swif
+  530  sudo yum install swig swig-devel
+  531  ./configure --help
+  532  ./configure --help | more
+  533  python3.5
+  534  which python3.5
+  535  ./configure --with-proj=/usr/local --with-python=/usr/local/bin/python3.5
+  536  sudo yum search jasper
+  537  sudo yum install jasper jasper-devel
+  538  ./configure --with-proj=/usr/local --with-python=/usr/local/bin/python3.5
+  539  make
+  540  sudo make install
+  541  gdalinfo
+  542  sudo ldconfig
+  543  gdalinfo
+  544  find /usr -name 'gdal_array*'
+  545  python3.5
+  546  ls /usr/local/lib
+  547  find /usr -name 'libgdal.so.1'
+  548  sudo find /usr -name 'libgdal.so.1'
+  549  sudo ln -s /usr/local/lib/libgdal.so /usr/local/lib/libgdal.so.1
+  550  sudo ldconfig
+  551  python3.5
+  552  cd ~/apps/OTB-7.1.0-Linux64
+  553  ls
+  554  history | grep source
+  555  cd ..
+  556  source OTB-7.1.0-Linux64/otbenv.profile 
+  557  history | grep export
+  558  export LD_LIBRARY_PATH=/usr/local/lib
+  559  python3.5
+  560  cd ~/src/g
+  561  cd ~/src/gla/
+  562  ls
+  563  cd src/
+  564  ls
+  565  cd cnes/
+  566  ls
+  567  python --version
+  568  python3.5 --version
+  569  python3.5 run.py
+  570  python3.5
+  571  ls /home/sac/.local/lib/python3.5/site-packages/osgeo/_osr.cpython-35m-x86_64-linux-gnu.so
+  572  python3.5
+  573  ls /home/sac/.local/lib/python3.5/site-packages/
+  574  pip3.5 uninstall gdal
+  575  python3.5
+  576  python3.5 run.py 
+  577  cd ..
+  578  ls
+  579  cd ..
+  580  ls
+  581  pip3.5 install -e .
+  582  cd src/
+  583  ls
+  584  cd cnes/
+  585  python run.py 
+  586  python3.5 run.py 
+  587  pip3.5 install pyproj --user
+  588  python3.5 run.py 
+  589  pip3.5 install shapely --user
+  590  python3.5 run.py 
+  591  gcloud init
+  592  ls
+  593  mkdir ~/data
+  594  gsutil cp gs://gla-datastore001/pleiades/Pleiades_UKSA100_SO18034613-100-01_DS_PHR1A_201807021141528_FR1_PX_W007N57_0704_05734.zip ~/data/
+  595  ls
+  596  python3.5  
+  597  python3.5  run.py 
+  598  python3.5  run.py  ~/data/Pleiades_UKSA100_SO18034613-100-01_DS_PHR1A_201807021141528_FR1_PX_W007N57_0704_05734.zip 
+  599  nano run.py 
+  600  cd ../..
+  601  cd ../
+  602  rm -rf gla/
+  603  history | grep git
+  604  git clone https://github.com/chris010970/gla.git
+  605  cd gla/src/cnes/
+  606  ls
+  607  sudo mkdir /data
+  608  sudo chown sac:sac /data
+  609  mkdir /data/pleiades
+  610  mv ~/data/Pleiades_UKSA100_SO18034613-100-01_DS_PHR1A_201807021141528_FR1_PX_W007N57_0704_05734.zip /data/pleiades/
+  611  mkdir /data/ancillary
+  612  mkdir /data/ancillary/srtm
+  613  mkdir /data/ancillary/geoid
+  614  wget https://gitlab.orfeo-toolbox.org/orfeotoolbox/otb-data/-/raw/master/Input/DEM/egm96.grd
+  615  mv egm96.grd /data/ancillary/geoid/
+  616  python3.5 
+  617  python3.5 /data/pleiades/Pleiades_UKSA100_SO18034613-100-01_DS_PHR1A_201807021141528_FR1_PX_W007N57_0704_05734.zip -dem_path /data/ancillary/dem -geoid_pathname /data/ancillary/geoid/egm96.grd 
+  618  python3.5 run.py /data/pleiades/Pleiades_UKSA100_SO18034613-100-01_DS_PHR1A_201807021141528_FR1_PX_W007N57_0704_05734.zip -dem_path /data/ancillary/dem -geoid_pathname /data/ancillary/geoid/egm96.grd 
+  619  nano pleiades.py 
+  620  python3.5 run.py /data/pleiades/Pleiades_UKSA100_SO18034613-100-01_DS_PHR1A_201807021141528_FR1_PX_W007N57_0704_05734.zip -dem_path /data/ancillary/dem -geoid_pathname /data/ancillary/geoid/egm96.grd 
+  621  sudo yum search 7zip
+  622  sudo yum install p7zip
+  623  more ../utility/ps.py 
+  624  7za
+  625  7za | more
+  626  ls
+  627  nano ../utility/ps.py 
+  628  python3.5 run.py /data/pleiades/Pleiades_UKSA100_SO18034613-100-01_DS_PHR1A_201807021141528_FR1_PX_W007N57_0704_05734.zip -dem_path /data/ancillary/dem -geoid_pathname /data/ancillary/geoid/egm96.grd 
+  629  fg
+  630  cd ..
+  631  ls
+  632  cd cne
+  633  cd src
+  634  cd cnes
+  635  ls
+  636  nano pleiades.py 
+  637  python3.5 run.py /data/pleiades/Pleiades_UKSA100_SO18034613-100-01_DS_PHR1A_201807021141528_FR1_PX_W007N57_0704_05734.zip -dem_path /data/ancillary/dem -geoid_pathname /data/ancillary/geoid/egm96.grd  > out
+  638  more out 
+  639  otbcli_DownloadSRTMTiles 
+  640  more otbcli_DownloadSRTMTiles 
+  641  cd /home/sac/apps/OTB-7.1.0-Linux64/bin/
+  642  more otbcli
+  643  nano -c otbcli
+  644  ls
+  645  otbcli_DownloadSRTMTiles 
+  646  cd ..
+  647  ls
+  648  ls lib/
+  649  ls -l lib/libproj.so
+  650  cd ~/src/proj-6.3.2
+  651  sudo make uninstall
+  652  ls /usr/local/lib
+  653  cd ..
+  654  ls
+  655  cd gdal-3.0.2
+  656  ./configure --with-proj=/home/sac/apps/OTB-7.1.0-Linux64 --with-python=/usr/local/bin/python3.5
+  657  ls 
+  658  ls ~/apps/OTB-7.1.0-Linux64/include/
+  659  ./configure --help | more
+  660  CPPFLAGS="-I/opt/osgeo/proj4/include -I/opt/osgeo/curl/include -I/opt/osgeo/szip/include" LDFLAGS="-L/opt/osgeo/proj4/lib -L/opt/osgeo/curl/lib -L/opt/osgeo/szip/lib" ./configure --prefix=/opt/osgeo/gdal --with-geos=/opt/osgeo/geos/bin/geos-config --with-netcdf=/opt/osgeo/netcdf-c --with-pg=/usr/local/pgsql/bin/pg_config --with-hdf5=/opt/osgeo/hdf5 --with-python --with-proj=/opt/osgeo/proj4 --with-kea=/opt/osgeo/kealib/bin/kea-config
+  661  ls /home/sac/apps/OTB-7.1.0-Linux64/lib/
+  662  sudo nano /etc/ld.so.conf.d/otb.conf
+  663  sudo ldconfig
+  664  sudo ldconfig -p
+  665  sudo ldconfig -p | grep OTB
+  666  history | grep configure
+  667  ./configure
+  668  sudo ldconfig -p | grep proj
+  669  sudo rm /etc/ld.so.conf.d/otb.conf 
+  670  sudo ldconfig
+  671  ls /home/sac/apps/OTB-7.1.0-Linux64
+  672  ./configure --with-proj=/home/sac/apps/OTB-7.1.0-Linux64
+  673  CPPFLAGS="-I/home/sac/apps/OTB-7.1.0-Linux64/include" LDFLAGS="-L/home/sac/apps/OTB-7.1.0-Linux64/lib -lgeotiff" ./configure --with-proj=/home/sac/apps/OTB-7.1.0-Linux64
+  674   ./configure --with-proj=/home/sac/apps/OTB-7.1.0-Linux64 --with-geotiff=/home/sac/apps/OTB-7.1.0-Linux64
+  675   ./configure --with-proj=/home/sac/apps/OTB-7.1.0-Linux64 --with-geotiff=/home/sac/apps/OTB-7.1.0-Linux64 | more
+  676  history | grep configure
+  677   ./configure --with-proj=/home/sac/apps/OTB-7.1.0-Linux64 --with-geotiff=/home/sac/apps/OTB-7.1.0-Linux64 --with-python=/usr/local/bin/python3.5
+  678  make clean
+  679  sudo make clean
+  680   ./configure --with-proj=/home/sac/apps/OTB-7.1.0-Linux64 --with-geotiff=/home/sac/apps/OTB-7.1.0-Linux64 --with-python=/usr/local/bin/python3.5
+  681  make
+  682   ./configure --with-proj=/home/sac/apps/OTB-7.1.0-Linux64 --with-geotiff=/home/sac/apps/OTB-7.1.0-Linux64 -with-hdf5=/home/sac/apps/OTB-7.1.0-Linux64  --with-python=/usr/local/bin/python3.5
+  683  cd ~/apps/OTB-7.1.0-Linux64/bin/
+  684  cd ..
+  685  ls
+  686  cd ~/src/gdal-3.0.2
+  687   ./configure --with-proj=/home/sac/apps/OTB-7.1.0-Linux64 --with-geotiff=/home/sac/apps/OTB-7.1.0-Linux64 -with-hdf5=/home/sac/apps/OTB-7.1.0-Linux64  --with-python=/usr/local/bin/python3.5 | more
+  688   ./configure --with-proj=/home/sac/apps/OTB-7.1.0-Linux64 --with-geotiff=/home/sac/apps/OTB-7.1.0-Linux64 -with-hdf5=/home/sac/apps/OTB-7.1.0-Linux64  --with-python=/usr/local/bin/python3.5 
+  689   ./configure --with-proj=/home/sac/apps/OTB-7.1.0-Linux64 --with-geotiff=/home/sac/apps/OTB-7.1.0-Linux64 -with-hdf5=/home/sac/apps/OTB-7.1.0-Linux64  --with-python=/usr/local/bin/python3.5 > out
+  690  grep hdf out
+  691  sudo make clean
+  692  make
+  693  export LD_LIBRARY_PATH=/home/sac/apps/OTB-7.1.0-Linux64/lib/
+  694  make
+  695  sudo make install
+  696  sudo ldconfig
+  697  gdalinfo
+  698  cd ~/src/gla/src/cnes/
+  699  ls
+  700  history | grep run
+  701  python3.5 run.py /data/pleiades/Pleiades_UKSA100_SO18034613-100-01_DS_PHR1A_201807021141528_FR1_PX_W007N57_0704_05734.zip -dem_path /data/ancillary/dem -geoid_pathname /data/ancillary/geoid/egm96.grd  > out
+  702  history | grep LD_LIBRARY_PATH *
+  703  history | grep LD_LIBRARY_PATH 
+  704  export LD_LIBRARY_PATH=/home/sac/apps/OTB-7.1.0-Linux64/lib/:/usr/local/lib
+  705  python3.5 run.py /data/pleiades/Pleiades_UKSA100_SO18034613-100-01_DS_PHR1A_201807021141528_FR1_PX_W007N57_0704_05734.zip -dem_path /data/ancillary/dem -geoid_pathname /data/ancillary/geoid/egm96.grd  > out
+  706  ls /data/ancillary/
+  707  python3.5 run.py /data/pleiades/Pleiades_UKSA100_SO18034613-100-01_DS_PHR1A_201807021141528_FR1_PX_W007N57_0704_05734.zip -dem_path /data/ancillary/srtm -geoid_pathname /data/ancillary/geoid/egm96.grd  > out
+  708  python3.5 run.py /data/pleiades/Pleiades_UKSA100_SO18034613-100-01_DS_PHR1A_201807021141528_FR1_PX_W007N57_0704_05734.zip -dem_path /data/ancillary/srtm -geoid_pathname /data/ancillary/geoid/egm96.grd 
+  709  ls
+  710  rmdir data/
+  711  cd data/
+  712  ls
+  713  rm -rf tmp/
+  714  cd ..
+  715  rm -rf data/
+  716  cd src/gla/src/cnes/
+  717  ls
+  718  history
+  719  export LD_LIBRARY_PATH=/home/sac/apps/OTB-7.1.0-Linux64/lib/:/usr/local/lib
+  720  nano pleiades.py 
+  721  nano dataset.py
+  722  python3.5 run.py /data/pleiades/Pleiades_UKSA100_SO18034613-100-01_DS_PHR1A_201807021141528_FR1_PX_W007N57_0704_05734.zip -dem_path /data/ancillary/srtm -geoid_pathname /data/ancillary/geoid/egm96.grd 
+  723  source ~/apps/OTB-7.1.0-Linux64/otbenv.profile 
+  724  python3.5 run.py /data/pleiades/Pleiades_UKSA100_SO18034613-100-01_DS_PHR1A_201807021141528_FR1_PX_W007N57_0704_05734.zip -dem_path /data/ancillary/srtm -geoid_pathname /data/ancillary/geoid/egm96.grd 
+  725  nano dataset.py
+  726  python3.5 run.py /data/pleiades/Pleiades_UKSA100_SO18034613-100-01_DS_PHR1A_201807021141528_FR1_PX_W007N57_0704_05734.zip -dem_path /data/ancillary/srtm -geoid_pathname /data/ancillary/geoid/egm96.grd 
+  727  sudo lsblk
+  728  sudo mkfs.ext4 -m 0 -E lazy_itable_init=0,discard /dev/sdb
+  729  sudo mkdir /mnt/disks
+  730  sudo mkdir /mnt/disks/data
+  731  sudo mount -o discard,defaults /dev/sdb /mnt/disks/data
+  732  df
+  733  sudo chmod a+rw /mnt/disks/data/
+  734  cp -R /data/pleiades/ /mnt/disks/data/
+  735  cd /mnt/disks/data/
+  736  ls
+  737  cd pleiades/
+  738  ls
+  739  rm -rf tmp/
+  740  cd ~/src/gla/src/cnes/
+  741  ls
+  742  history | grep run
+  743  python3.5 run.py /data/pleiades/Pleiades_UKSA100_SO18034613-100-01_DS_PHR1A_201807021141528_FR1_PX_W007N57_0704_05734.zip -dem_path /data/ancillary/srtm -geoid_pathname /data/ancillary/geoid/egm96.grd 
+  744  history | grep LD_LIBRARY
+  745  export LD_LIBRARY_PATH=/home/sac/apps/OTB-7.1.0-Linux64/lib/:/usr/local/lib
+  746  source ~/apps/OTB-7.1.0-Linux64/otbenv.profile 
+  747  python3.5 run.py /data/pleiades/Pleiades_UKSA100_SO18034613-100-01_DS_PHR1A_201807021141528_FR1_PX_W007N57_0704_05734.zip -dem_path /data/ancillary/srtm -geoid_pathname /data/ancillary/geoid/egm96.grd 
+  748  python3.5 run.py /mnt/disks/data/pleiades/Pleiades_UKSA100_SO18034613-100-01_DS_PHR1A_201807021141528_FR1_PX_W007N57_0704_05734.zip -dem_path /data/ancillary/srtm -geoid_pathname /data/ancillary/geoid/egm96.grd 
+  749  rm /mnt/disks/data/pleiades/tmp
+  750  rm -rf /mnt/disks/data/pleiades/tmp
+  751  python3.5 run.py /mnt/disks/data/pleiades/Pleiades_UKSA100_SO18034613-100-01_DS_PHR1A_201807021141528_FR1_PX_W007N57_0704_05734.zip -dem_path /data/ancillary/srtm -geoid_pathname /data/ancillary/geoid/egm96.grd 
+  752  nano pleiades.py 
+  753  python3.5 run.py /mnt/disks/data/pleiades/Pleiades_UKSA100_SO18034613-100-01_DS_PHR1A_201807021141528_FR1_PX_W007N57_0704_05734.zip -dem_path /data/ancillary/srtm -geoid_pathname /data/ancillary/geoid/egm96.grd 
+  754  export GDAL_CACHEMAX=16384
+  755  rm -rf /mnt/disks/data/pleiades/tmp
+  756  python3.5 run.py /mnt/disks/data/pleiades/Pleiades_UKSA100_SO18034613-100-01_DS_PHR1A_201807021141528_FR1_PX_W007N57_0704_05734.zip -dem_path /data/ancillary/srtm -geoid_pathname /data/ancillary/geoid/egm96.grd 
+  757  df
+  758  ls /mnt/disks/data/pleiades/tmp/mosaic/
+  759  ls /mnt/disks/data/pleiades/tmp/mosaic/MS/
+  760  gdalinfo /mnt/disks/data/pleiades/tmp/mosaic/MS/
+  761  gdalinfo /mnt/disks/data/pleiades/tmp/mosaic/MS/IMG_PHR1A_MS_201807021141528_ORT_3614028101-2_MOSAIC_CAL.
+  762  gdalinfo /mnt/disks/data/pleiades/tmp/mosaic/MS/IMG_PHR1A_MS_201807021141528_ORT_3614028101-2_MOSAIC_CAL.TIF 
+  763  gdalinfo /mnt/disks/data/pleiades/tmp/mosaic/MS/IMG_PHR1A_MS_201807021141528_ORT_3614028101-2_MOSAIC_CAL.TIF | more
+  764  fg
+  765  ps -ef 
+  766  kill 3727
+  767  history > history
