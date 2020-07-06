@@ -1,7 +1,8 @@
 repository:
-    name: "spot_6"
+    name: "pleiades"
     keywords: "optical"
-    path: "d:\\data\\scratch\\ssgp\\raw"
+    path: "d:\\data\\scratch\\ssgp\\cog"
+    credentials: "C:\\Users\\Chris.Williams\\.gcs\\gla001-232b82940cbf.json"
     templates:
         preprocess: "d:\\data\\sql\\dbingest-raster-preprocess.sql"
         postprocess: "d:\\data\\sql\\dbingest-raster-postprocess.sql"
@@ -14,8 +15,7 @@ repository:
       - name: "ard"
         description: "pansharpen 0.5m"
         keywords: "ard"
-        path: "(38012|39019).*$"
+        pattern: "(38012|39019)*.TIF"
         measurements:
-          - name: "pan"
-            src: "*_PAN_*.TIF"
+          - name: "reflectance"
             units: "milli"
