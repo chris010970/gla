@@ -1,5 +1,4 @@
-from measurement import Measurement
-
+from src.database.objects.measurement import Measurement
 
 class Product:
 

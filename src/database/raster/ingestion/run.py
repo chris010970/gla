@@ -2,7 +2,9 @@ import os
 import glob
 import argparse
 
-from manager import Manager
+from ingester import Ingester
+from src.database.objects.manager import Manager
+
 
 def parseArguments(args=None):
 
@@ -12,7 +14,7 @@ def parseArguments(args=None):
 
     # parse command line arguments
     parser = argparse.ArgumentParser(description='process-ard')
-    parser.add_argument('config', action="store") # 'C:\\Users\\Chris.Williams\Desktop\\ingest.yml'
+    parser.add_argument('config_file', action="store") # 'C:\\Users\\Chris.Williams\Desktop\\ingest.yml'
     parser.add_argument('repository', action="store")
     parser.add_argument('product', action="store")
 
@@ -27,7 +29,7 @@ def main():
 
     # parse arguments
     args = parseArguments()
-    manager = Manager( args.config )
+    manager = Manager( args.config_file )
 
     # get repository
     repo = manager.getRepository( args.repository )
@@ -38,7 +40,8 @@ def main():
         if product is not None:
 
             # ingest images
-            repo.ingestImages( product ) 
+            obj = Ingester( repo )
+            obj.process ( product )
             
     return
     

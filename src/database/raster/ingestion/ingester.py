@@ -6,151 +6,25 @@ import tempfile
 from threading import Thread
 from progressbar import ProgressBar
 
-from server import Server
-from product import Product
-
-from src.utility import fs
 from src.utility import parser
-from src.utility.gsclient import GsClient
 
 
-class Repository:
+class Ingester:
 
 
-    def __init__( self, obj, threads=1 ):
+    def __init__( self, repo, threads=6 ):
 
         """
         constructor
         """
 
-        self._obj = obj
+        # members
         self._threads = threads
-
-        # create list of product objects
-        self._products = []
-        for item in self._obj[ 'products' ]:
-            self._products.append( Product ( item ) )
-
-        # create list of servers
-        self._servers = []        
-        for item in self._obj[ 'servers' ]:
-            self._servers.append( Server ( item ) )
-
-        # create list of templates
-        self._templates = {}       
-        for key, value in self._obj[ 'templates' ].items():    
-
-            # read sql template file
-            with open ( str( value ) ) as fp:
-                command = fp.read()
-
-            # append buffer and id 
-            self._templates[ key ] = command
-
+        self._repo = repo
         return
-        
-
-    def getName( self ):
-
-        """
-        get repository name
-        """
-
-        return self._obj[ 'name' ]
 
 
-    def getPath( self ):
-
-        """
-        get repository root path
-        """
-
-        return self._obj[ 'path' ]
-
-
-    def getKeywords( self ):
-
-        """
-        get keywords
-        """
-
-        return self._obj[ 'keywords' ]
-
-
-    def getDescription( self ):
-
-        """
-        get description
-        """
-
-        return self._obj[ 'description' ]
-
-
-    def getProductNameList( self ):
-
-        """
-        get product name list
-        """
-
-        names = []
-
-        # create list of product names
-        for item in self._products:
-            names.append( item.getName() )
-    
-        return names
-
-
-    def getProduct( self, name ):
-
-        """
-        get product 
-        """
-
-        product = None
-
-        # search repository list for name match
-        for item in self._products:
-            if item.getName() == name:
-                product = item
-                break
-    
-        return product
-
-
-    def getProductImageList( self, product, path=None ):
-
-        """
-        get image list
-        """
-
-        images = None
-
-        # use default path
-        if path is None:
-            path = self._obj[ 'path' ] 
-
-        # attempt to parse path as gcs uri
-        bucket, prefix = GsClient.parseUri( path )
-        if bucket is not None:
-
-            # add credential variables to environment
-            if self._obj[ 'credentials' ] is not None:
-                GsClient.updateCredentials( self._obj[ 'credentials' ] )
-
-            # create client and get image list                
-            client = GsClient( bucket )
-            images = client.getImageUriList( prefix, pattern=product.getPattern() )
-
-        else:
-
-            # get local file list matched with regexp
-            images = fs.getFileList( path, product.getPattern() )
-
-        return images
-
-
-    def ingestImages( self, product ):
+    def process( self, product ):
 
         """
         ingest image into database as postgis raster objects
@@ -166,7 +40,7 @@ class Repository:
 
             # get schema and product table names
             parameters[ 'DATABASE' ] = server.getDatabase()
-            parameters[ 'SCHEMA' ] = self.getName()
+            parameters[ 'SCHEMA' ] = self._repo.getName()
             parameters[ 'PRODUCT' ] = product.getName()
 
             # get records for product and measurement ancillary tables
@@ -178,13 +52,13 @@ class Repository:
 
 
         # 1 or more servers
-        for server in self._servers:
+        for server in self._repo.getServerList():
 
             # compile list of product-specific core values to specialise sql scripts
             parameters = getCoreParameterList( server )
 
             # execute preprocess operation
-            out, error, code = self.executeTemplateOperation( server, 'preprocess', parameters )
+            out, error, code = server.executeTemplateOperation( self._repo.getTemplate( 'ingest-preprocess' ), parameters )
             if 'ERROR' not in str( error ):
 
                 # get ingestion task list - split across multiple threads
@@ -214,7 +88,7 @@ class Repository:
         """
 
         tasks = []
-        images = self.getProductImageList( product )
+        images = self._repo.getProductImageList( product )
 
         # initialise loop variables
         step = int ( round ( len ( images ) / self._threads ) )
@@ -319,45 +193,15 @@ class Repository:
                 out, error, code = task[ 'server' ].loadRaster( task[ 'parameters' ] )
                 if 'ERROR' not in str( error ):
 
-                    # execute post-process
-                    self.executeTemplateOperation( task[ 'server' ], 'postprocess', task[ 'parameters' ] )
+                    # execute post-process                    
+                    task[ 'server' ].executeTemplateOperation( self._repo.getTemplate( 'ingest-postprocess' ), 
+                                                                task[ 'parameters' ] )
 
                 # raise exception on error
                 if 'ERROR' in str( error ):
                     raise ValueError ( pathname, out, error, code )
                     
         return
-
-
-    def executeTemplateOperation( self, server, operation, parameters ):
-
-        """
-        execute operation
-        """
-
-        def transposeTokens( command, parameters  ):
-
-            """
-            transpose parameter values into template sql
-            """
-
-            for key, value in parameters.items():
-
-                # map demarked key with value
-                label = '!' + key.upper() + '!'
-                command = command.replace( label, value )
-
-            return command
-
-        # transpose template with actual parameter values
-        buffer = transposeTokens( self._templates[ operation ], parameters )
-
-        # execute transposed template from file 
-        with tempfile.TemporaryDirectory() as tmp_path:
-            pathname = os.path.join( tmp_path, '{}.sql'.format( operation ) )
-            out, error, code = server.executeTransactionFromFile( fs.writeFile( pathname, buffer ) )
-
-        return out, error, code
 
 
     def isLoaded(self, server, pathname ):
@@ -367,10 +211,9 @@ class Repository:
         """
 
         # query pathname in catalog table
-        records = server.executeQuery( "SELECT pathname FROM {repository}.cat WHERE pathname = '{pathname}'".format(    repository=self.getName(), 
-                                                                                                                        pathname=pathname ) )
+        records = server.getRecords( "SELECT pathname FROM {repository}.cat WHERE pathname = '{pathname}'".format(  repository=self._repo.getName(), 
+                                                                                                                    pathname=pathname ) )
         if len( records ) == 1:
             return True
 
         return False
-

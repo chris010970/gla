@@ -2,7 +2,8 @@ import os
 import gdal
 import yaml
 
-from repository import Repository
+from src.database.objects.repository import Repository
+
 
 class Manager:
 
