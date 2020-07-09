@@ -3,6 +3,27 @@ import re
 import fnmatch
 
 
+def getPathNameList ( path, pattern ):
+
+    """
+    apply regexp to filter file list
+    """
+
+    # get pattern matched file list
+    result = []
+    for root, dirs, files in os.walk(path):
+                
+        for name in files:
+
+            pathname = os.path.join( root, name )
+            x = re.search( pattern, pathname )
+
+            if x is not None:
+                result.append( os.path.join(root, name) )
+
+    return result
+
+
 def getFileList ( path, pattern ):
 
     """
