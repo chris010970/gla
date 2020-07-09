@@ -40,8 +40,8 @@ def checkOutputExists( blobs, client ):
     for blob in blobs:
 
         # get blobs in output directory
-        path = os.path.dirname( blob ).replace( 'raw', 'ard' )
-        out_blobs = client.getBlobNameList( path, [ '.TIF' ] )
+        path = os.path.dirname( blob ).replace( 'ard', 'cog' )
+        out_blobs = client.getBlobNameList( path, '.*TIF' )
 
         # no blobs - no output
         if len ( out_blobs ) == 0:
@@ -93,7 +93,7 @@ def main():
 
             # retrieve list of blobs in prefix + tle directory            
             bucket_path = '{}/{}'.format( prefix, str( tle ) ).lstrip('/')
-            blobs = client.getBlobNameList( bucket_path, [ '.TIF' ] )
+            blobs = client.getBlobNameList( bucket_path, '.*TIF' )
             print( 'blobs found: {}'.format( str( len( blobs ) ) ) )
 
             # check output files already exist
