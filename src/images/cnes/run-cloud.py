@@ -25,7 +25,7 @@ def checkOutputExists( blobs, client ):
 
         # get blobs in output directory
         path = os.path.dirname( blob ).replace( 'raw', 'ard' )
-        out_blobs = client.getBlobNameList( path, [ '.TIF' ] )
+        out_blobs = client.getBlobNameList( path, '.*TIF' )
 
         # no blobs - no output
         if len ( out_blobs ) == 0:
@@ -211,7 +211,7 @@ def main():
             # retrieve list of blobs in prefix + tle directory            
             bucket_path = '{}/{}'.format( prefix, str( tle ) ).lstrip('/')
 
-            blobs = client.getBlobNameList( bucket_path, [ '.zip' ] )
+            blobs = client.getBlobNameList( bucket_path, '.*zip' )
             logger.info( 'blobs found: {}'.format( str( len( blobs ) ) ) )
 
             # apply filters to blob list
