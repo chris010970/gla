@@ -29,6 +29,30 @@ def setNoData( pathname, nodata=0 ):
     return
 
 
+def checkOutputExists( blobs, client ):
+
+    """
+    remove blobs whose output directory + files already exist
+    """
+
+    # for each blob name
+    results = []
+    for blob in blobs:
+
+        # get blobs in output directory
+        path = os.path.dirname( blob ).replace( 'ard', 'ard_update' )
+        out_blobs = client.getBlobNameList( path, '.*_MS_.*TIF' )
+
+        # no blobs - no output
+        if len ( out_blobs ) == 0:
+            results.append( blob )
+        else:
+            print ( 'output exists: {}', path )
+
+    return results
+
+
+
 def parseArguments(args=None):
 
     """
@@ -81,6 +105,7 @@ def main():
 
                 # upload cog to bucket                       
                 upload_path = '{}/{}'.format( bucket_path, parser.getDateTimeString( pathname ) )
+                upload_path = upload_path.replace( 'ard', 'ard_update' ) 
 
                 print( 'uploading: {}'.format( pathname ) )
                 client.uploadFile( pathname, prefix=upload_path, flatten=True )
