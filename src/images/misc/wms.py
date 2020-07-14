@@ -77,7 +77,7 @@ def rescaleTo8Bit( pathname, out_pathname, bands=[ 1, 2, 3 ], no_data=0 ):
         os.makedirs( out_path )
 
     # get percentiles to computing 16bit to 8bit scaling  
-    step = 0.1
+    step = 1.0
     while step < 10.0:
 
         # iteratively reduce percentile range until 256 values accommodated
@@ -85,7 +85,7 @@ def rescaleTo8Bit( pathname, out_pathname, bands=[ 1, 2, 3 ], no_data=0 ):
         for result in results:        
             
             if result[ 1 ] - result[ 0 ] > 255:
-                step += 0.5
+                step += 1.0
                 continue
 
         break
@@ -164,8 +164,8 @@ def checkOutputExists( blobs, client ):
     for blob in blobs:
 
         # get blobs in output directory
-        path = os.path.dirname( blob ).replace( 'ard', 'rgb' )
-        out_blobs = client.getBlobNameList( path, '.*TIF' )
+        path = os.path.dirname( blob ).replace( 'ard', 'wms' )
+        out_blobs = client.getBlobNameList( path, '.*_MS_.*TIF' )
 
         # no blobs - no output
         if len ( out_blobs ) == 0:
@@ -216,7 +216,7 @@ def main():
 
             # retrieve list of blobs in prefix + tle directory            
             bucket_path = '{}/{}'.format( prefix, str( tle ) ).lstrip('/')
-            blobs = client.getBlobNameList( bucket_path, '.*TIF' )
+            blobs = client.getBlobNameList( bucket_path, '.*_MS_.*TIF' )
             print( 'blobs found: {}'.format( str( len( blobs ) ) ) )
 
             # check output files already exist
@@ -242,7 +242,7 @@ def main():
                                 ['BIGTIFF=YES', 'COMPRESS=JPEG', 'NUM_THREADS=ALL_CPUS' ] )
 
                 # upload cog to bucket                       
-                upload_path = '{}/{}'.format( bucket_path, parser.getDateTimeString( out_pathname ) )
+                upload_path = '{}/{}'.format( bucket_path.replace( 'ard', 'wms' ), parser.getDateTimeString( out_pathname ) )
 
                 print( 'uploading: {}'.format( out_pathname ) )
                 client.uploadFile( out_pathname, prefix=upload_path, flatten=True )
