@@ -1,4 +1,5 @@
 import os 
+import pdb
 import operator 
 import argparse
 import numpy as np
@@ -16,7 +17,7 @@ from src.utility.gsclient import GsClient
 def getRasterBounds( path ):
 
     """
-    Placeholder
+    get extent of raster in crs coordinates
     """
 
     # compute the bounding box of a gdal raster file
@@ -28,45 +29,10 @@ def getRasterBounds( path ):
     return box( lrx, lry, ulx, uly ) 
 
 
-def getReprojectedRasterBounds( path, epsg ):
-
-    """
-    Placeholder
-    """
-
-    # compute the bounding box of a gdal raster file
-    in_ds = gdal.Open(path) 
-    ext = None
-
-    # get spatial reference systems    
-    s_prj = in_ds.GetProjection()
-    s_srs = osr.SpatialReference( wkt = s_prj )
-
-    t_srs = osr.SpatialReference ()
-    t_srs.ImportFromEPSG ( epsg )
-
-    # compute bounding box coordinates in target srs
-    s_geo = in_ds.GetGeoTransform ()
-    tx = osr.CoordinateTransformation ( s_srs, t_srs )
-
-    x_size = in_ds.RasterXSize
-    y_size = in_ds.RasterYSize
-
-    (ulx, uly, ulz ) = tx.TransformPoint( s_geo[0],  s_geo[3])
-    (lrx, lry, lrz ) = tx.TransformPoint( s_geo[0] + s_geo[1] * x_size, \
-                                          s_geo[3] + s_geo[5] * y_size )
-
-    # validate reprojected extent
-    if ( ~np.isinf( ulx ) and ~np.isinf( uly ) and ~np.isinf( lrx ) and ~np.isinf( lry ) ):
-        ext = box(lrx,lry,ulx,uly)
-
-    return ext, s_srs 
-
-
 def getTimeIndexList( images ):
 
     """
-    Placeholder
+    generate list of dates mapped to pathnames
     """
 
     # get index list
@@ -94,6 +60,8 @@ def parseArguments(args=None):
     parser.add_argument( 'key_pathname', action="store" )
     parser.add_argument( 'out_pathname', action="store" )
     parser.add_argument('-t','--tles', nargs='+', help='tles', type=int, required=True )
+    parser.add_argument('-chunk_size', default=None, action="store", type=int )
+    parser.add_argument('-pattern', default='.*TIF', action="store" )
 
     return parser.parse_args(args)
 
@@ -132,7 +100,8 @@ def main():
         sortList = sorted( indexList.items(), key=operator.itemgetter(0) )
 
         # shape file attributes - time default
-        df = gpd.GeoDataFrame(columns=['location','geometry','time'])
+        gdf = gpd.GeoDataFrame(columns=['location','geometry','time'])
+        gdf.crs = {'init' :'epsg:27700'}
 
         # for each item in sort list
         for entry in sortList:
@@ -140,7 +109,7 @@ def main():
 
             # insert datetime and associated raster pathnames into index file
             for location in entry[ 1 ]:
-                df = df.append({    'location': location, 
+                gdf = gdf.append({  'location': location, 
                                     'geometry': getRasterBounds( location ), 
                                     'time': datetime }, 
                                     ignore_index=True )
@@ -150,7 +119,7 @@ def main():
             os.makedirs( os.path.dirname( args.out_pathname ) )
 
         print( 'created: {}'.format( args.out_pathname ) )
-        df.to_file( args.out_pathname )
+        gdf.to_file( args.out_pathname )
 
     return
 
