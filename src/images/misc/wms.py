@@ -1,6 +1,6 @@
 import os
 import pdb
-import gdal
+import gdal, ogr
 import shutil
 import argparse
 import numpy as np
@@ -29,7 +29,7 @@ def convertToCog( pathname, out_pathname, creationOptions ):
                 
     return
 
-             
+
 def getPercentiles( pathname, band_idxs=[1,2,3], nbuckets=1000, percentiles=[2.0, 98.0] ):
 
     """
@@ -65,7 +65,7 @@ def getPercentiles( pathname, band_idxs=[1,2,3], nbuckets=1000, percentiles=[2.0
     return results
 
 
-def rescaleTo8Bit( pathname, out_pathname, bands=[ 1, 2, 3 ], no_data=0 ):
+def rescaleTo8Bit( pathname, mask_pathname, out_pathname, bands=[ 1, 2, 3 ], no_data=0 ):
 
     """
     convert image to COG with gdal translate functionality
@@ -97,6 +97,18 @@ def rescaleTo8Bit( pathname, out_pathname, bands=[ 1, 2, 3 ], no_data=0 ):
         # get dimensions
         nCols = src_ds.GetRasterBand(1).XSize
         nRows = src_ds.GetRasterBand(1).YSize
+
+        # open roi mask
+        gml = ogr.Open( mask_pathname )
+        layer = gml.GetLayer()
+        
+        # create mask in memory
+        mask_ds = gdal.GetDriverByName('MEM').Create( '', nCols, nRows, 1, gdal.GDT_Byte )
+        mask_ds.SetGeoTransform( src_ds.GetGeoTransform() )  
+        mask_ds.SetProjection( src_ds.GetProjection() )
+
+        # burn roi vector into mask image
+        gdal.RasterizeLayer( mask_ds, [1], layer, None )                    
 
         # create internal mask
         gdal.SetConfigOption('GDAL_TIFF_INTERNAL_MASK', 'YES')
@@ -143,8 +155,8 @@ def rescaleTo8Bit( pathname, out_pathname, bands=[ 1, 2, 3 ], no_data=0 ):
                     out_band.WriteArray( np.uint8( result ), 0, row )
 
                     # write internal mask if 1st iteration
-                    if out_idx == 0:
-                        out_band.GetMaskBand().WriteArray( np.uint8( idx ), 0, row ) 
+                    if out_idx == 0:                    
+                        out_band.GetMaskBand().WriteArray( mask_ds.GetRasterBand(1).ReadAsArray( 0, row, nCols, 1 ), 0, row ) 
 
             # saves to disk!!
             out_ds.FlushCache() 
@@ -158,7 +170,7 @@ def checkOutputExists( blobs, client ):
     """
     remove blobs whose output directory + files already exist
     """
-
+ 
     # for each blob name
     results = []
     for blob in blobs:
@@ -227,13 +239,16 @@ def main():
 
                 # download blob to local file system
                 print ( 'downloading: {}'.format ( blob ) )
-
                 pathname = client.downloadBlob( blob, args.download_path )
-                tmp_pathname = pathname.replace( 'ard', 'tmp' )  
+
+                # get mask pathname
+                mask_blobs = client.getImageUriList( os.path.dirname( blob ).replace( 'ard', 'anc' ), 'ROI.*_MS_.*_MSK.GML' )
+                if len ( mask_blobs ) > 0:
+                    mask_pathname = mask_blobs[ 0 ]
 
                 # rescale to 8bit
-                print ( 'generating: {}'.format( tmp_pathname ) )
-                rescaleTo8Bit(  pathname, tmp_pathname )
+                tmp_pathname = pathname.replace( 'ard', 'tmp' )  
+                rescaleTo8Bit( pathname, mask_pathname, tmp_pathname )
 
                 # convert to cog with jpeg compression
                 out_pathname = tmp_pathname.replace( 'tmp', 'wms' )
