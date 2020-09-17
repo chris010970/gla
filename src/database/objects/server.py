@@ -153,7 +153,7 @@ class Server:
         return records
 
 
-    def executeCommand( self, command ):
+    def executeCommand( self, command, isolation_level=None ):
 
         """
         execute command
@@ -163,6 +163,10 @@ class Server:
 
         # get connection
         conn = self.getConnection()
+
+        if isolation_level is not None:
+            conn.set_isolation_level(isolation_level)
+
         cur = conn.cursor()
         
         try:
@@ -340,6 +344,52 @@ class Server:
         return self.executeCommand( query )
 
 
+    def checkSchemaExists( self, schema ):
+
+        """
+        check schema exists
+        """
+
+        # construct boolean query of information_schema
+        query = """
+                SELECT EXISTS (SELECT 1 
+                FROM pg_catalog.pg_namespace 
+                WHERE nspowner <> 1 AND nspname = '{schema}' );
+                """.format ( schema=schema )
+
+        records = self.getRecords( query )
+        return records[ 0 ][ 0 ]
+
+
+    def dropSchema( self, schema ):
+
+        """
+        drop schema
+        """
+
+        # drop schema if exists and everything it contains
+        query = """
+                DROP TABLE IF EXISTS {schema} CASCADE
+                """.format ( schema=schema )
+
+        return self.executeCommand( query )
+
+
+    def createSchema( self, schema ):
+
+        """
+        create schema
+        """
+
+        # create table with fields defined by arguments
+        query = """
+                CREATE SCHEMA IF NOT EXISTS {schema}
+                """.format ( schema=schema )
+
+        # execute create table command
+        return self.executeCommand( query )
+
+
     def postProcessRasterTable( self, schema, table, column_name='rast', constraints=None ):
 
         """
@@ -451,4 +501,86 @@ class Server:
                                             ALTER TABLE {schema}.{overview_table} ADD COLUMN id SERIAL PRIMARY KEY;
                                             """.format ( schema=schema, overview_table=overview_table ) )
 
+        return error
+
+
+    def getSchemaNames( self, match=None ):
+
+        """
+        get schemas
+        """
+
+        # get schema names
+        query = """
+                SELECT DISTINCT ( table_schema ) FROM information_schema.tables;
+                """
+
+        # add optional substring match
+        if match is not None:
+            query = """
+                    SELECT DISTINCT ( table_schema ) FROM information_schema.tables WHERE table_schema ~ '{match}';
+                    """.format( match=match )
+        
+        return self.getRecords( query )
+
+
+    def getTableNames( self, schema, match=None ):
+
+        """
+        get table names
+        """
+
+        # get schema names
+        query = """
+                SELECT DISTINCT ( table_name ) FROM information_schema.tables WHERE table_schema='{schema}';
+                """.format( schema=schema )
+        
+        # add optional substring match
+        if match is not None:
+            query = """
+                    SELECT DISTINCT ( table_name ) FROM information_schema.tables WHERE table_schema='{schema}' AND table_name ~ '{match}';
+                    """.format( schema=schema, match=match )
+
+        return self.getRecords( query )
+
+
+    def vacuumTables( self, schema, match=None ):
+
+        """
+        vacuum tables
+        """
+
+        # get table names 
+        records = self.getTableNames( schema )
+        for record in records:
+
+            # apply optional match
+            if match is None or match in record[ 0 ]:
+                self.vacuumTable( schema, record[ 0 ] )
+
+        return 
+
+
+    def vacuumTable( self, schema, table ):
+
+        """
+        vacuum table
+        """
+
+        error = None
+
+        # get table names
+        records = self.getTableNames( schema )
+        for record in records:
+
+            # vacuum analyze table
+            error = self.executeCommand(    """
+                                            VACUUM ANALYZE {schema}.{table};
+                                            """.format( schema=schema, table=record[ 0 ] ),
+                                            psycopg2.extensions.ISOLATION_LEVEL_AUTOCOMMIT )    
+            # report error
+            if error:
+                print ( 'VACUUM ERROR: {schema}.{table}'.format( schema=schema, table=table ) )
+                break
+                                
         return error
