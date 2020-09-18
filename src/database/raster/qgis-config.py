@@ -2,80 +2,64 @@ import os
 import re
 import yaml
 import argparse
-
-from Server import server
 from datetime import datetime
 
+from qgis.core import QgsApplication
 from qgis.core import QgsProject
 from qgis.core import QgsDataSourceUri
 from qgis.core import QgsRasterLayer
 from qgis.core import QgsLayerTree
 from qgis.core import QgsContrastEnhancement
 
+from src.database.objects.server import Server
+
 import pdb
 
 
-def getRasterTableNames( server ):
-
-    """
-    get data tables
-    """
-
-    data = {}
-
-    # get ldd specific schemas
-    schemas = server.getSchemaNames( match='^ldd_.*' )
-    for schema in schemas:
-
-        # get raster tables - no ovrviews !
-        data[ record[ 0 ] ] = server.getTableNames ( schema[ 0 ], match='^rast_[0-9]{8}_.*')
-
-    return data
-
-
-def addRasterLayers( project, server ):
-
+def addRasterLayers( project, server, schema ):
+ 
     """
     add postgis raster layers to qgis project
     """
 
-    groups = {}
+    groups = []
 
     # get postgis raster table
-    data = getRasterTableNames( server )
-    for schema, tables in data.items():
+    records = server.getTableNames ( schema, match='^rast_[0-9]{8}_.*')
+    print ( 'processing {count} tables in schema {schema}'.format( count=len( records ), schema=schema ) )
+    for record in records:
 
-        groups[ schema ] = []
-        for table in tables:
+        # get gdal postgis raster connection string
+        table = record[ 0 ]
+        conn = '{gdal} mode=2 schema={schema} table={table} column=rast'.format (   gdal=server.getGdalConnectionString(),
+                                                                                    schema=schema,
+                                                                                    table=table )
+        # get layer object
+        layer = QgsRasterLayer( conn, table, 'gdal' )
+        if layer.isValid():
 
-            # extract date
-            table = table[ 0 ]
-
-            # get gdal postgis raster connection string
-            conn = '{gdal} mode=2 schema={schema} table={table} column=rast'.format (   gdal=server.getGdalConnectionString(),
-                                                                                        schema=schema,
-                                                                                        table=table )
-            # get layer object
-            layer = QgsRasterLayer( conn, table, 'gdal' )
-            if layer.isValid():
+            try:
+            
+                # add to project
+                layer.setContrastEnhancement( QgsContrastEnhancement.StretchToMinimumMaximum )
+                QgsProject.instance().addMapLayer( layer )
 
                 # extract date from table name
-                m = re.search( 'rast_[0-9]{8}_.*', table )
-                if m:
+                dt = datetime.strptime( re.search( '[0-9]{8}', table )[ 0 ], '%Y%m%d' )
 
-                    # add to project
-                    layer.setContrastEnhancement( QgsContrastEnhancement.StretchToMinimumMaximum )
-                    QgsProject.instance().addMapLayer( layer )
+                sub_group = next(( item for item in groups if str( dt.year ) == item[ 'year' ] ), None )
+                if sub_group is None:
+                    groups.append ( { 'year' : str( dt.year ), 'layers' : [] } )
 
-                    # record layer info
-                    date = datetime.strptime( m[ 0 ], '%Y%m%d' )
-                    if str( date.year ) not in groups[ schema ]:
-                        groups[ schema ].append ( { str( date.year ) : [] } )
+                # add layer id to schema / year indexed lists
+                sub_group = next((item for item in groups if str( dt.year ) == item[ 'year' ] ), None )
+                sub_group[ 'layers' ].append( { 'id' : layer.id(), 'dt' : dt, 'name' : table } )
+            
+            except Exception as e:
+                print ( 'ERROR: {conn} {msg}'.format( conn=conn, msg=e) )
 
-                    # add layer id to schema / year indexed lists
-                    groups[ schema ][ str( date.year ) ].append( layer.layerId() )
-
-    return groups
+    # return layers in yearly slices in descending order
+    return sorted( groups, key=lambda k: k['year'], reverse=True )
 
 
 def parseArguments(args=None):
@@ -86,7 +70,9 @@ def parseArguments(args=None):
 
     # parse command line arguments
     parser = argparse.ArgumentParser(description='process-aoi')
-    parser.add_argument('config_pathname', action="store")
+    parser.add_argument('project_file', action="store")
+    parser.add_argument('server_file', action="store")
+    parser.add_argument('out_path', action="store")
 
     return parser.parse_args(args)
 
@@ -100,36 +86,50 @@ def main():
     # parse arguments
     args = parseArguments()
 
+    # initialise application
+    qgs = QgsApplication([], False)
+    QgsApplication.setPrefixPath( 'C:\\Program Files\\QGIS 3.14\\apps\\qgis', True )
+    QgsApplication.initQgis()
+
     # load config parameters from file
     with open( args.server_file, 'r' ) as f:
         server = Server( yaml.safe_load( f ) )
 
-    # initialise project instance
-    project = QgsProject.instance() #'C:\\Users\\Chris.Williams\\Desktop\\template-config.qgs'
-    project.read( args.config_file )
+    # get ldd specific schemas
+    records = server.getSchemaNames( match='^ldd_.*' )
+    for record in records:
 
-    # add postgis raster layers to project
-    groups = addRasterLayers( project, server )
+        # initialise project instance
+        project = QgsProject.instance() #
+        project.read( args.project_file )
 
-    # get root node
-    root = project.layerTreeRoot()
-    for permission_id, year in groups.items():
+        groups = addRasterLayers( project, server, record[ 0 ] )
+        root = project.layerTreeRoot()
 
-        # add group nodes
-        parent = root.addGroup( permission_id )
-        child = parent.addGroup( year )
+        for group in groups:
 
-        for _id in groups[ permission_id ][ year ]:
+            # sort layers into descending order
+            group[ 'layers' ] = sorted( group[ 'layers' ], key=lambda k: k ['name'], reverse=True )
 
-            layer = root.findLayer( _id )
-            clone = layer.clone()
+            # add layers to parent node
+            parent = root.addGroup( group[ 'year' ] )
+            for item in group[ 'layers' ]:
 
-            child.insertChildNode( 0, clone )
-            root.removeChildNode(layer)
+                layer = root.findLayer( item[ 'id' ] )
+                clone = layer.clone()
 
-        # set checked and expand
-        parent.setItemVisibilityCheckedRecursive(False)
-        parent.setExpanded( False )
+                parent.insertChildNode( 0, clone )
+                root.removeChildNode(layer)
+
+            # set checked and expand
+            parent.setItemVisibilityCheckedRecursive(False)
+            parent.setExpanded( False )
+
+        # write project file to disc
+        if not os.path.exists( args.out_path ):
+            os.makedirs( args.out_path )
+
+        project.write( os.path.join( args.out_path, '{schema}.qgs'.format( schema=record[ 0 ] ) ) )
 
 
     return
