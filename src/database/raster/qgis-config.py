@@ -7,6 +7,7 @@ from datetime import datetime
 from qgis.core import QgsApplication
 from qgis.core import QgsProject
 from qgis.core import QgsDataSourceUri
+from qgis.core import QgsProviderRegistry
 from qgis.core import QgsRasterLayer
 from qgis.core import QgsLayerTree
 from qgis.core import QgsContrastEnhancement
@@ -31,11 +32,56 @@ def addRasterLayers( project, server, schema ):
 
         # get gdal postgis raster connection string
         table = record[ 0 ]
+
+        uri_config = {
+            # database parameters
+            'dbname': server.getDatabase(),      # The PostgreSQL database to connect to.
+            'host': server.getHost(),     # The host IP address or localhost.
+            'port': server.getPort,          # The port to connect on.
+            'sslmode':QgsDataSourceUri.SslDisable, # SslAllow, SslPrefer, SslRequire, SslVerifyCa, SslVerifyFull
+            
+            # user and password are not needed if stored in the authcfg or service
+            'authcfg': None,  # The QGIS athentication database ID holding connection details.
+            'service': None,         # The PostgreSQL service to be used for connection to the database.
+            'username':'sac',        # The PostgreSQL user name.
+            'password':'sac',        # The PostgreSQL password for the user.
+            
+            # table and raster column details
+            'schema': schema,      # The database schema that the table is located in.
+            'table': table,   # The database table to be loaded.
+            'geometrycolumn':'rast',# raster column in PostGIS table
+            'sql':None,             # An SQL WHERE clause. It should be placed at the end of the string.
+            'key':None,             # A key column from the table.
+            'srid':'epsg:27700',            # A string designating the SRID of the coordinate reference system.
+            'estimatedmetadata':'False', # A boolean value telling if the metadata is estimated.
+            'type':None,            # A WKT string designating the WKB Type.
+            'selectatid':None,      # Set to True to disable selection by feature ID.
+            'options':None,         # other PostgreSQL connection options not in this list.
+            'enableTime': None,
+            'temporalDefaultTime': None,
+            'temporalFieldIndex': None,
+            'mode':'2',             # GDAL 'mode' parameter, 2 unions raster tiles, 1 adds tiles separately (may require user input)
+        }
+        # remove any NULL parameters
+        uri_config = {key:val for key, val in uri_config.items() if val is not None}
+        
+        # get the metadata for the raster provider and configure the URI
+        md = QgsProviderRegistry.instance().providerMetadata('postgresraster')
+        uri = QgsDataSourceUri(md.encodeUri(uri_config))
+
+        layer = QgsRasterLayer(  uri.uri(False), table, "postgresraster")
+
+        """
         conn = '{gdal} mode=2 schema={schema} table={table} column=rast'.format (   gdal=server.getGdalConnectionString(),
                                                                                     schema=schema,
                                                                                     table=table )
+                                                                        
         # get layer object
-        layer = QgsRasterLayer( conn, table, 'gdal' )
+        layer = QgsRasterLayer( conn, table,         postgresraster")
+
+        """
+
+
         if layer.isValid():
 
             try:
@@ -56,7 +102,11 @@ def addRasterLayers( project, server, schema ):
                 sub_group[ 'layers' ].append( { 'id' : layer.id(), 'dt' : dt, 'name' : table } )
             
             except Exception as e:
-                print ( 'ERROR: {conn} {msg}'.format( conn=conn, msg=e) )
+                print ( 'ERROR: {conn} {msg}'.format( conn=uri.uri(False), msg=e) )
+
+            break
+
+        
 
     # return layers in yearly slices in descending order
     return sorted( groups, key=lambda k: k['year'], reverse=True )
