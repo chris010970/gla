@@ -9,6 +9,7 @@ from qgis.core import QgsProject
 from qgis.core import QgsDataSourceUri
 from qgis.core import QgsProviderRegistry
 from qgis.core import QgsRasterLayer
+from qgis.core import QgsRasterMinMaxOrigin
 from qgis.core import QgsLayerTree
 from qgis.core import QgsContrastEnhancement
 
@@ -37,7 +38,7 @@ def addRasterLayers( project, server, schema ):
             # database parameters
             'dbname': server.getDatabase(),      # The PostgreSQL database to connect to.
             'host': server.getHost(),     # The host IP address or localhost.
-            'port': server.getPort,          # The port to connect on.
+            'port': server.getPort(),          # The port to connect on.
             'sslmode':QgsDataSourceUri.SslDisable, # SslAllow, SslPrefer, SslRequire, SslVerifyCa, SslVerifyFull
             
             # user and password are not needed if stored in the authcfg or service
@@ -52,7 +53,7 @@ def addRasterLayers( project, server, schema ):
             'geometrycolumn':'rast',# raster column in PostGIS table
             'sql':None,             # An SQL WHERE clause. It should be placed at the end of the string.
             'key':None,             # A key column from the table.
-            'srid':'epsg:27700',            # A string designating the SRID of the coordinate reference system.
+            'srid':'27700',            # A string designating the SRID of the coordinate reference system.
             'estimatedmetadata':'False', # A boolean value telling if the metadata is estimated.
             'type':None,            # A WKT string designating the WKB Type.
             'selectatid':None,      # Set to True to disable selection by feature ID.
@@ -65,29 +66,19 @@ def addRasterLayers( project, server, schema ):
         # remove any NULL parameters
         uri_config = {key:val for key, val in uri_config.items() if val is not None}
         
-        # get the metadata for the raster provider and configure the URI
+        # get metadata for raster provider and configure uri
         md = QgsProviderRegistry.instance().providerMetadata('postgresraster')
         uri = QgsDataSourceUri(md.encodeUri(uri_config))
 
+        # create layer
         layer = QgsRasterLayer(  uri.uri(False), table, "postgresraster")
-
-        """
-        conn = '{gdal} mode=2 schema={schema} table={table} column=rast'.format (   gdal=server.getGdalConnectionString(),
-                                                                                    schema=schema,
-                                                                                    table=table )
-                                                                        
-        # get layer object
-        layer = QgsRasterLayer( conn, table,         postgresraster")
-
-        """
-
-
         if layer.isValid():
 
             try:
             
                 # add to project
-                layer.setContrastEnhancement( QgsContrastEnhancement.StretchToMinimumMaximum )
+                layer.setContrastEnhancement(   QgsContrastEnhancement.StretchToMinimumMaximum, 
+                                                QgsRasterMinMaxOrigin.CumulativeCut )
                 QgsProject.instance().addMapLayer( layer )
 
                 # extract date from table name
@@ -103,10 +94,7 @@ def addRasterLayers( project, server, schema ):
             
             except Exception as e:
                 print ( 'ERROR: {conn} {msg}'.format( conn=uri.uri(False), msg=e) )
-
-            break
-
-        
+      
 
     # return layers in yearly slices in descending order
     return sorted( groups, key=lambda k: k['year'], reverse=True )
@@ -138,7 +126,7 @@ def main():
 
     # initialise application
     qgs = QgsApplication([], False)
-    QgsApplication.setPrefixPath( 'C:\\Program Files\\QGIS 3.14\\apps\\qgis', True )
+    QgsApplication.setPrefixPath( '/usr', True )
     QgsApplication.initQgis()
 
     # load config parameters from file
@@ -148,6 +136,11 @@ def main():
     # get ldd specific schemas
     records = server.getSchemaNames( match='^ldd_.*' )
     for record in records:
+        print ( record[ 0 ])
+
+        pathname = os.path.join( args.out_path, '{schema}.qgs'.format( schema=record[ 0 ] ) )
+        if os.path.exists( pathname ):
+            continue
 
         # initialise project instance
         project = QgsProject.instance() #
@@ -156,31 +149,35 @@ def main():
         groups = addRasterLayers( project, server, record[ 0 ] )
         root = project.layerTreeRoot()
 
-        for group in groups:
+        for gid, group in enumerate( groups ):
 
             # sort layers into descending order
-            group[ 'layers' ] = sorted( group[ 'layers' ], key=lambda k: k ['name'], reverse=True )
+            group[ 'layers' ] = sorted( group[ 'layers' ], key=lambda k: k ['name'] )
 
             # add layers to parent node
             parent = root.addGroup( group[ 'year' ] )
-            for item in group[ 'layers' ]:
+            for lid, item in enumerate( group[ 'layers' ] ):
 
-                layer = root.findLayer( item[ 'id' ] )
+                layer = root.findLayer( item[ 'id' ] )               
                 clone = layer.clone()
-
+             
                 parent.insertChildNode( 0, clone )
                 root.removeChildNode(layer)
 
+                # switch on most recent raster layer
+                if gid == 0 and lid == 0:
+                    parent.findLayer( item[ 'id' ] ).setItemVisibilityChecked( True )
+                
             # set checked and expand
-            parent.setItemVisibilityCheckedRecursive(False)
-            parent.setExpanded( False )
+            if gid != 0:
+                parent.setItemVisibilityCheckedRecursive(False)
+                parent.setExpanded( False )
 
         # write project file to disc
         if not os.path.exists( args.out_path ):
             os.makedirs( args.out_path )
 
-        project.write( os.path.join( args.out_path, '{schema}.qgs'.format( schema=record[ 0 ] ) ) )
-
+        project.write( pathname )
 
     return
     

@@ -1,0 +1,18 @@
+repository:
+    name: "spot"
+    keywords: "optical"
+    path: "gs://gla-datastore001/ssgp/cog"
+    credentials: /home/sac/.gcs/gla001-232b82940cbf.json
+    templates:
+        ingest-preprocess: "/home/sac/src/gla/cfg/dbingest-raster-preprocess.sql"
+        ingest-postprocess: "/home/sac/src/gla/cfg/dbingest-raster-postprocess.sql"
+    servers:
+      - config-file: "/home/sac/src/gla/cfg/servers/gla.yml"
+    products:
+      - name: "pan"
+        description: "pansharpen 1.5m"
+        keywords: "ard, pan"
+        pattern: '(38755|40053)\/[0-9]{8}_[0-9]{6}.*_PAN_.*TIF'
+        measurements:
+          - name: "pan"
+            units: "milli"

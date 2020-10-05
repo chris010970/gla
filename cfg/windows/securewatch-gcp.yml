@@ -1,0 +1,18 @@
+repository:
+    name: "pleiades"
+    keywords: "optical"
+    path: "gs://gla-datastore001/ssgp/cog"
+    credentials: /home/sac/.gcs/gla001-232b82940cbf.json
+    templates:
+        ingest-preprocess: "C:\\Users\\Chris.Williams\\Documents\\GitHub\\gla\\cfg\\dbingest-raster-preprocess.sql"
+        ingest-postprocess: "C:\\Users\\Chris.Williams\\Documents\\GitHub\\gla\\cfg\\dbingest-raster-postprocess.sql"
+    servers:
+      - config-file: "C:\\Users\\Chris.Williams\\Documents\\GitHub\\gla\\cfg\\servers\\gcp.yml"
+    products:
+      - name: "pan"
+        description: "pansharpen 0.5m"
+        keywords: "ard, pan"
+        pattern: '(38012|39019)\/[0-9]{8}_[0-9]{6}.*_PAN_.*TIF'
+        measurements:
+          - name: "pan"
+            units: "milli"

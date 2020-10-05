@@ -1,0 +1,18 @@
+repository:
+    name: "worldview3"
+    keywords: "optical"
+    path: "gs://gla-datastore001/securewatch/cog"
+    credentials: /home/sac/.gcs/gla001-232b82940cbf.json
+    templates:
+        ingest-preprocess: "/home/sac/src/gla/cfg/dbingest-raster-preprocess.sql"
+        ingest-postprocess: "/home/sac/src/gla/cfg/dbingest-raster-postprocess.sql"
+    servers:
+      - config-file: "/home/sac/src/gla/cfg/servers/gla.yml"
+    products:
+      - name: "pan"
+        description: "pansharpen 0.30m"
+        keywords: "ard, pan"
+        pattern: '(40115)\/[0-9]{8}_[0-9]{6}.*TIF'
+        measurements:
+          - name: "pan"
+            units: "DN"

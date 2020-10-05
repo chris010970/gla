@@ -4,10 +4,10 @@ repository:
     path: "gs://gla-datastore001/ssgp/cog"
     credentials: /home/sac/.gcs/gla001-232b82940cbf.json
     templates:
-        ingest-preprocess: "/home/sac/src/gla/cfg/dbingest-raster-preprocess.sql"
-        ingest-postprocess: "/home/sac/src/gla/cfg/dbingest-raster-postprocess.sql"
+        ingest-preprocess: "C:\\Users\\Chris.Williams\\Documents\\GitHub\\gla\\cfg\\dbingest-raster-preprocess.sql"
+        ingest-postprocess: "C:\\Users\\Chris.Williams\\Documents\\GitHub\\gla\\cfg\\dbingest-raster-postprocess.sql"
     servers:
-      - config-file: "/home/sac/src/gla/cfg/servers/localhost.yml"
+      - config-file: "C:\\Users\\Chris.Williams\\Documents\\GitHub\\gla\\cfg\\servers\\gcp.yml"
     products:
       - name: "pan"
         description: "pansharpen 1.5m"
